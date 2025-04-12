@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/my_shared_preferences.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
+import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
@@ -38,6 +39,7 @@ class _MainAppState extends State<MainApp> {
         setState(() {
           user = userSharedPreferences;
           initialLocation = '/${ViewData.dashboard.path}';
+          UserStore.setCurrentUser(userSharedPreferences);
         });
       }
     });
@@ -48,7 +50,7 @@ class _MainAppState extends State<MainApp> {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: GoRouter(
-        routes: routes(user),
+        routes: routes(),
         navigatorKey: navigatorKey,
         initialLocation: initialLocation,
       ),
@@ -57,7 +59,7 @@ class _MainAppState extends State<MainApp> {
   }
 }
 
-List<RouteBase> routes(User? user) {
+List<RouteBase> routes() {
   return [
     GoRoute(
       path: '/${ViewData.auth.path}',
@@ -69,7 +71,37 @@ List<RouteBase> routes(User? user) {
     ),
     GoRoute(
       path: '/${ViewData.dashboard.path}',
-      builder: (context, state) => user != null ? Dashboard(user: user) : const Dashboard(),
+      builder: (context, state) {
+        // get current user at the time of navigation
+        User? currentUser = UserStore.currentUser;
+        
+        // if not available in UserStore, try to get from SharedPreferences
+        if (currentUser == null) {
+          // handle the synchronously for the router
+          final userFromPrefs = MySharedPreferences.getUser().then((user) {
+            if (user != null) {
+              // update the UserStore with the user from SharedPreferences
+              UserStore.setCurrentUser(user);
+            }
+            return user;
+          });
+          
+          // return the Dashboard with or without user
+          return FutureBuilder<User?>(
+            future: userFromPrefs,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Dashboard(user: snapshot.data);
+              } else {
+                return const Dashboard();
+              }
+            },
+          );
+        }
+        
+        // if already have the user, return Dashboard with user
+        return Dashboard(user: currentUser);
+      },
     ),
   ];
 }

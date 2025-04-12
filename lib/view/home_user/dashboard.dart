@@ -44,7 +44,7 @@ class _DashboardState extends State<Dashboard> {
         HomePage(),
         SavedPage(),
         ScanPage(),
-        AddRecipePage(),
+        AddRecipePage(user: user),
         ProfilePage(user: user),
       ];
     }

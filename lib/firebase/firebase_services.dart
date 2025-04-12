@@ -107,7 +107,7 @@ class FirebaseServices {
         final User user = User.fromJson(userData.data()!);
 
         // set user to user provider
-        UserStore.setCurrentUser(user);
+        await UserStore.setCurrentUser(user);
       } catch (e) {
         return {
           'success': false,

@@ -29,13 +29,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _logOut() async {
-    // clear current user data in app event bus, firebase auth and shared preferences
-    final response = await UserStore.logoutUser();
-
-    // logout
-    if (response['success']) {
-      MySnackBar.showSnackBar(response['message']);
-      navigatorKey.currentContext!.go('/${ViewData.auth.path}');
+    try {
+      // clear current user data in app event bus, firebase auth and shared preferences
+      final response = await UserStore.logoutUser();
+  
+      // logout
+      if (response['success']) {
+        navigatorKey.currentContext!.go('/${ViewData.auth.path}');
+      } else {
+        MySnackBar.showSnackBar('Failed to logout: ${response['message']}');
+      }
+    } catch (e) {
+      MySnackBar.showSnackBar('An error occurred during logout');
     }
   }
 
@@ -43,61 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return user != null ? _buildLoggedUserPage(screenSize) : _buildNoLogInUserPage(screenSize);
-  }
-
-  // will display if the user is logged in
-  Widget _buildLoggedUserPage(Size screenSize) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox(
-              width: screenSize.width * 0.6,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // user name
-                  Text(user!.username,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  // edit profile
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text('edit your profile',
-                      style: TextStyle(
-                        fontSize: 20,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // user avatar
-            Container(
-              width: screenSize.width * 0.3,
-              alignment: Alignment.center,
-              child: MyAvatar(
-                radius: screenSize.width * 0.10,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 50),
-        // services and policy options
-        _buildOptionList(screenSize, true),
-        SizedBox(height: 50),
-        // app version
-        Text('Version 1.0'),
-      ],
-    );
+    return user == null ? _buildNoLogInUserPage(screenSize) : _buildLoggedUserPage(screenSize);
   }
 
   // will display for guest user
@@ -157,6 +108,60 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // will display if the user is logged in
+  Widget _buildLoggedUserPage(Size screenSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            SizedBox(
+              width: screenSize.width * 0.6,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // user name
+                  Text(user!.username,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  // edit profile
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text('edit your profile',
+                      style: TextStyle(
+                        fontSize: 20,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // user avatar
+            Container(
+              width: screenSize.width * 0.3,
+              alignment: Alignment.center,
+              child: MyAvatar(
+                radius: screenSize.width * 0.10,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 50),
+        // services and policy options
+        _buildOptionList(screenSize, true),
+        SizedBox(height: 50),
+        // app version
+        Text('Version 1.0'),
+      ],
+    );
+  }
+
   Widget _buildOptionList(Size screenSize, bool isLoggedIn) {
     return Container(
       width: screenSize.width * 0.9,
@@ -186,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             SizedBox(height: 20),
             isLoggedIn ? GestureDetector(
-              onTap: () => _logOut(),
+              onTap: () async => await _logOut(),
               child: Text('Log Out'),
             ) : SizedBox(),
             SizedBox(height: 50), // just a dummy space

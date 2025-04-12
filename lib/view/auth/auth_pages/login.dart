@@ -193,9 +193,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginButton() {
     return MyButton(
-      onPressed: () async {
-        await loginWithEmailOrPhone();
-      },
+      onPressed: () async => await loginWithEmailOrPhone(),
       text: 'Login',
       backgroundColor: const Color.fromARGB(255, 26, 218, 128),
       isLoading: isLoginLoading,
@@ -208,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         // google button
         MyButton(
-          onPressed: loginWithGoogle,
+          onPressed: () async => await loginWithGoogle(),
           text: 'Google',
           backgroundColor: const Color.fromARGB(255, 244, 81, 63),
           icon: Icon(FontAwesomeIcons.google,
@@ -220,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
         SizedBox(height: 15),
         // continue as guest
         MyButton(
-          onPressed: loginAsGuest,
+          onPressed: () async => await loginAsGuest(),
           text: 'Continue as guest',
           backgroundColor: Colors.grey,
           isEnabled: !_isLoading(),

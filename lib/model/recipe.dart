@@ -5,7 +5,7 @@ class Recipe {
   String recipeName;
   String description;
   String imageUrl;
-  List<Category> categories;
+  List<Tag> tags;
   List<Ingredient> ingredients;
   List<String> steps;
   String authorID;
@@ -21,7 +21,7 @@ class Recipe {
     required this.recipeName,
     this.description = '',
     this.imageUrl = '',
-    this.categories = const [],
+    this.tags = const [],
     this.ingredients = const [],
     this.steps = const [],
     required this.authorID,
@@ -39,7 +39,7 @@ class Recipe {
       recipeName: json['recipeName'],
       description: json['description'],
       imageUrl: json['imageUrl'],
-      categories: json['categories'].map((category) => Category.values[category]).toList(),
+      tags: json['tags'].map((tag) => Tag.values[tag]).toList(),
       ingredients: json['ingredients'].map((ingredient) => Ingredient.fromJson(ingredient)).toList(),
       steps: json['steps'],
       authorID: json['authorID'],
@@ -58,7 +58,7 @@ class Recipe {
       'recipeName': recipeName,
       'description': description,
       'imageUrl': imageUrl,
-      'categories': categories.map((category) => category.name).toList(),
+      'tags': tags.map((tag) => tag.name).toList(),
       'ingredients': ingredients.map((ingredient) => ingredient.toJson()).toList(),
       'steps': steps,
       'authorID': authorID,
@@ -72,7 +72,7 @@ class Recipe {
   }
 }
 
-enum Category {
+enum Tag {
   chinese,
   western,
   japanese,

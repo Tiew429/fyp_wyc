@@ -15,11 +15,11 @@ class UserStore {
   static User? get currentUser => _currentUser;
 
   // login or update
-  static void setCurrentUser(User user) {
+  static Future<void> setCurrentUser(User user) async {
     _currentUser = user;
 
     // save user to shared preferences
-    MySharedPreferences.saveUser(user);
+    await MySharedPreferences.saveUser(user);
 
     // fire event when user data is changed
     AppEventBus.instance.fire(UserEvent(user: user));
@@ -27,14 +27,21 @@ class UserStore {
 
   // logout
   static Future<Map<String, dynamic>> logoutUser() async {
-    if (_currentUser != null) {
-      clearCurrentUser();
+    try {
+      if (_currentUser != null) {
+        return await clearCurrentUser();
+      }
+      
+      return {
+        'success': true,
+        'message': '',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Logout failed: ${e.toString()}',
+      };
     }
-
-    return {
-      'success': true,
-      'message': 'Logged out successfully',
-    };
   }
 
   static Future<Map<String, dynamic>> clearCurrentUser() async {

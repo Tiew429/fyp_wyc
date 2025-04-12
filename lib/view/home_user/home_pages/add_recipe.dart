@@ -1,15 +1,24 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
+import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/ingredient.dart';
+import 'package:fyp_wyc/model/recipe.dart';
+import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/utils/my_button.dart';
 import 'package:fyp_wyc/utils/my_text_field.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddRecipePage extends StatefulWidget {
-  const AddRecipePage({super.key});
+  final User? user;
+
+  const AddRecipePage({
+    super.key,
+    this.user,
+  });
 
   @override
   State<AddRecipePage> createState() => _AddRecipePageState();
@@ -18,11 +27,12 @@ class AddRecipePage extends StatefulWidget {
 class _AddRecipePageState extends State<AddRecipePage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _instructionsController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _image;
   bool _isLoadingImage = false;
   List<Ingredient> _ingredients = [];
+  List<Tag> _tags = [];
+  
 
   void _openBottomSheet() {
     showModalBottomSheet(
@@ -85,6 +95,57 @@ class _AddRecipePageState extends State<AddRecipePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
+    return widget.user == null ? _buildNoLogInUserPage(screenSize) : _buildLogInUserPage(screenSize);
+  }
+
+  Widget _buildNoLogInUserPage(Size screenSize) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'You are not logged in',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Log in to access add recipes',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: () {
+              navigatorKey.currentContext!.push('/${ViewData.auth.path}');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 26, 218, 128),
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Text(
+              'Login / Sign Up',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: 50),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogInUserPage(Size screenSize) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
