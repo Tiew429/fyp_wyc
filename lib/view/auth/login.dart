@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fyp_wyc/utils/my_button.dart';
 import 'package:fyp_wyc/utils/my_text_field.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fyp_wyc/data/viewdata.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onSignUpClicked;
@@ -58,9 +59,15 @@ class _LoginPageState extends State<LoginPage> {
         Row(
           children: [
             Spacer(),
-            Text('Forgot password?',
-              style: TextStyle(
-                fontSize: 16,
+            GestureDetector(
+              onTap: () {
+                context.go('/${ViewData.forgot.path}');
+              },
+              child: Text('Forgot password?',
+                style: TextStyle(
+                  color: Colors.lightBlue,
+                  fontSize: 16,
+                ),
               ),
             ),
           ]
@@ -92,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
         SizedBox(height: 15),
         // continue as guest
         MyButton(
-          onPressed: () => context.go('/dashboard'),
+          onPressed: () => context.go('/${ViewData.dashboard.path}'),
           text: 'Continue as guest',
           backgroundColor: Colors.grey,
         ),
