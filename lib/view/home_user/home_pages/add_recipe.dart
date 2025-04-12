@@ -65,7 +65,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
     setState(() {
       _isLoadingImage = true;
     });
-    final pickedFile = await _imagePicker.pickImage(source: ImageSource.camera);
+    final pickedFile = await ImageFunctions.takePhoto(_imagePicker);
     if (pickedFile != null) {
       final croppedImage = await ImageFunctions.cropImage(pickedFile);
       setState(() {
@@ -81,7 +81,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
     setState(() {
       _isLoadingImage = true;
     });
-    final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImageFunctions.pickImage(_imagePicker);
     if (pickedFile != null) {
       final croppedImage = await ImageFunctions.cropImage(pickedFile);
       setState(() {

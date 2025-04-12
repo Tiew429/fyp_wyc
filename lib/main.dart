@@ -6,6 +6,7 @@ import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
+import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase/firebase_options.dart';
@@ -68,6 +69,14 @@ List<RouteBase> routes() {
     GoRoute(
       path: '/${ViewData.forgot.path}',
       builder: (context, state) => const ForgotPage(),
+    ),
+    GoRoute(
+      path: '/${ViewData.profileEdit.path}',
+      builder: (context, state) {
+        User? currentUser = UserStore.currentUser;
+        // there is no way to navigate to this page if there is no user, so use ! to bypass the null check
+        return ProfileEditPage(user: currentUser!);
+      },
     ),
     GoRoute(
       path: '/${ViewData.dashboard.path}',

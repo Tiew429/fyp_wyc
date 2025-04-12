@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_datacheck.dart';
 import 'package:fyp_wyc/model/user.dart';
+import 'package:image_picker/image_picker.dart';
 
 class FirebaseServices {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
@@ -63,6 +64,9 @@ class FirebaseServices {
         'phone': phone,
         'createdAt': createdAt,
         'role': 'user',
+        'aboutMe': '',
+        'gender': '',
+        'ageRange': '',
         'avatarUrl': '',
         'savedRecipes': [],
         'addedRecipes': [],
@@ -141,6 +145,20 @@ class FirebaseServices {
       return {
         'success': false,
         'message': 'Error occured when logging out: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> updateUser(String email, XFile? imageFile, String newName, String newAboutMe, String newGender) async {
+    try {
+      return {
+        'success': true,
+        'message': 'User updated successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when updating user: $e',
       };
     }
   }

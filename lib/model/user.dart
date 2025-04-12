@@ -6,6 +6,9 @@ class User {
   String username;
   String createdAt; // store datetime as iso8601 string
   String role; // user or admin
+  String aboutMe;
+  String gender;
+  String ageRange;
   String avatarUrl; // path to avatar image in firebase storage
   List<String> savedRecipes; // list of saved recipe ids
   List<String> addedRecipes; // list of added recipe ids
@@ -19,6 +22,9 @@ class User {
     required this.username,
     required this.createdAt,
     this.role = 'user',
+    this.aboutMe = '',
+    this.gender = 'Not to say',
+    this.ageRange = '',
     this.avatarUrl = '',
     this.savedRecipes = const [],
     this.addedRecipes = const [],
@@ -34,6 +40,9 @@ class User {
       username: json['username'],
       createdAt: json['createdAt'],
       role: json['role'],
+      aboutMe: json['aboutMe'],
+      gender: json['gender'],
+      ageRange: json['ageRange'],
       avatarUrl: json['avatarUrl'],
       savedRecipes: DataTypeConverter.convertToStringList(json['savedRecipes']),
       addedRecipes: DataTypeConverter.convertToStringList(json['addedRecipes']),
@@ -49,6 +58,9 @@ class User {
       'phone': phone,
       'username': username,
       'role': role,
+      'aboutMe': aboutMe,
+      'gender': gender,
+      'ageRange': ageRange,
       'createdAt': createdAt,
       'avatarUrl': avatarUrl,
       'savedRecipes': savedRecipes,

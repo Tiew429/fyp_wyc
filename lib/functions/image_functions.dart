@@ -3,9 +3,13 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageFunctions {
-  static pickImage() async {}
+  static Future<XFile?> pickImage(ImagePicker imagePicker) async {
+    return await imagePicker.pickImage(source: ImageSource.gallery);
+  }
 
-  static takePhoto() async {}
+  static Future<XFile?> takePhoto(ImagePicker imagePicker) async {
+    return await imagePicker.pickImage(source: ImageSource.camera);
+  }
 
   static Future<XFile?> cropImage(XFile? image) async {
     final croppedImage = await ImageCropper().cropImage(
