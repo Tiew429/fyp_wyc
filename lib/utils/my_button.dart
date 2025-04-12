@@ -8,6 +8,8 @@ class MyButton extends StatelessWidget {
   final double? width;
   final double? height;
   final double? borderRadius;
+  final bool? isLoading; // to show loading indicator
+  final bool? isEnabled; // to disable button when loading, and avoid from all buttons display loading indicator
 
   const MyButton({
     super.key,
@@ -18,6 +20,8 @@ class MyButton extends StatelessWidget {
     this.width,
     this.height,
     this.borderRadius,
+    this.isLoading = false,
+    this.isEnabled = true,
   });
 
   @override
@@ -25,10 +29,10 @@ class MyButton extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: isLoading ?? false ? () {} : isEnabled ?? true ? onPressed : () {},
       style: ElevatedButton.styleFrom(
         fixedSize: Size(width ?? screenSize.width, height ?? 50),
-        backgroundColor: backgroundColor,
+        backgroundColor: isEnabled ?? true ? backgroundColor : backgroundColor.withOpacity(0.5),
         padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 30),
@@ -39,14 +43,21 @@ class MyButton extends StatelessWidget {
         children: [
           icon ?? SizedBox.shrink(),
           SizedBox(width: 10),
-          Text(text,
+          isLoading ?? false ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2,
+            ),
+          ) : Text(text,
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
-        ]
+        ],
       ),
     );
   }

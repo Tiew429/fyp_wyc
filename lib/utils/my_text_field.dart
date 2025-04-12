@@ -6,9 +6,12 @@ class MyTextField extends StatelessWidget {
   final String hintText;
   final bool isPassword;
   final bool isVisible;
-  final Function(String)? onChanged;
+  final VoidCallback? onSuffixIconTap;
   final Color? backgroundColor;
   final bool borderDisplay;
+  final String? Function(String?)? validator;
+  final Function(String)? onChanged;
+  final bool isReadOnly;
 
   const MyTextField({
     super.key,
@@ -17,21 +20,25 @@ class MyTextField extends StatelessWidget {
     required this.hintText,
     this.isPassword = false,
     this.isVisible = true,
-    this.onChanged,
+    this.onSuffixIconTap,
     this.backgroundColor,
     this.borderDisplay = true,
+    this.validator,
+    this.onChanged,
+    this.isReadOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      validator: validator,
+      onChanged: onChanged,
+      readOnly: isReadOnly,
       decoration: InputDecoration(
         prefixIcon: icon,
         suffixIcon: isPassword ? IconButton(
-          onPressed: () {
-            onChanged?.call(controller.text);
-          },
+          onPressed: onSuffixIconTap,
           icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
         ) : null,
         hintText: hintText,

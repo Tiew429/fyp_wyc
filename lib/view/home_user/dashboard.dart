@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:fyp_wyc/view/home/pages/add_recipe.dart';
-import 'package:fyp_wyc/view/home/pages/home.dart';
-import 'package:fyp_wyc/view/home/pages/saved.dart';
-import 'package:fyp_wyc/view/home/pages/scan.dart';
-import 'package:fyp_wyc/view/home/pages/profile.dart';
+import 'package:fyp_wyc/model/user.dart';
+import 'package:fyp_wyc/view/home_user/home_pages/add_recipe.dart';
+import 'package:fyp_wyc/view/home_user/home_pages/home.dart';
+import 'package:fyp_wyc/view/home_user/home_pages/saved.dart';
+import 'package:fyp_wyc/view/home_user/home_pages/scan.dart';
+import 'package:fyp_wyc/view/home_user/home_pages/profile.dart';
 
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  final User? user;
+  
+  const Dashboard({
+    super.key, 
+    this.user,
+  });
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -15,8 +21,10 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   late int _selectedIndex;
+  User? user;
 
-  final List<Widget> _pages = [
+  // declare pages list but don't initialize it yet
+  List<Widget> _pages = [
     HomePage(),
     SavedPage(),
     ScanPage(),
@@ -28,11 +36,30 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     _selectedIndex = 0;
+    user = widget.user;
+    
+    // update pages if user is logged in
+    if (user != null) {
+      _pages = [
+        HomePage(),
+        SavedPage(),
+        ScanPage(),
+        AddRecipePage(),
+        ProfilePage(user: user),
+      ];
+    }
+  }
+  
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
       body: _buildBody(),
       floatingActionButton: _buildFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -45,7 +72,7 @@ class _DashboardState extends State<Dashboard> {
 
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+        padding: EdgeInsets.only(left: screenSize.width * 0.05, right: screenSize.width * 0.05, top: 16.0),
         child: _pages[_selectedIndex],
       ),
     );
@@ -56,6 +83,7 @@ class _DashboardState extends State<Dashboard> {
       width: 50,
       height: 50,
       child: FloatingActionButton(
+        shape: CircleBorder(),
         backgroundColor: Color(0xFF00BFA6),
         elevation: 2,
         child: Icon(

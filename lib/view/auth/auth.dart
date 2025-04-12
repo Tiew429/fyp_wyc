@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fyp_wyc/view/auth/login.dart';
-import 'package:fyp_wyc/view/auth/sign_up.dart';
+import 'package:fyp_wyc/view/auth/auth_pages/login.dart';
+import 'package:fyp_wyc/view/auth/auth_pages/sign_up.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -42,6 +42,8 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
