@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+
+class ImageFunctions {
+  static pickImage() async {}
+
+  static takePhoto() async {}
+
+  static Future<XFile?> cropImage(XFile? image) async {
+    final croppedImage = await ImageCropper().cropImage(
+      sourcePath: image!.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Color(0xFF00BFA6),
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio16x9,
+            CropAspectRatioPreset.ratio4x3,
+          ],
+        ),
+        IOSUiSettings(
+          title: 'Crop Image',
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio16x9,
+            CropAspectRatioPreset.ratio4x3,
+          ],
+        ),
+      ],
+    );
+    if (croppedImage != null) {
+      return XFile(croppedImage.path);
+    } else {
+      return XFile(image.path);
+    }
+  }
+}

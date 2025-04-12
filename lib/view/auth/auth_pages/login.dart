@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         // google button
         MyButton(
-          onPressed: () async {},
+          onPressed: loginWithGoogle,
           text: 'Google',
           backgroundColor: const Color.fromARGB(255, 244, 81, 63),
           icon: Icon(FontAwesomeIcons.google,
@@ -220,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
         SizedBox(height: 15),
         // continue as guest
         MyButton(
-          onPressed: () => loginAsGuest(),
+          onPressed: loginAsGuest,
           text: 'Continue as guest',
           backgroundColor: Colors.grey,
           isEnabled: !_isLoading(),

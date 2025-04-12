@@ -12,6 +12,8 @@ class MyTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
   final bool isReadOnly;
+  final int maxLines;
+  final TextInputType keyboardType;
 
   const MyTextField({
     super.key,
@@ -26,6 +28,8 @@ class MyTextField extends StatelessWidget {
     this.validator,
     this.onChanged,
     this.isReadOnly = false,
+    this.maxLines = 1,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
@@ -35,6 +39,8 @@ class MyTextField extends StatelessWidget {
       validator: validator,
       onChanged: onChanged,
       readOnly: isReadOnly,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         prefixIcon: icon,
         suffixIcon: isPassword ? IconButton(
