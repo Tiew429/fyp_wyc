@@ -30,9 +30,11 @@ class _AddRecipePageState extends State<AddRecipePage> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _image;
   bool _isLoadingImage = false;
-  List<Ingredient> _ingredients = [];
-  List<Tag> _tags = [];
-  
+  final List<Ingredient> _ingredients = [];
+  final List<String> _cookingInstructions = [];
+  int _timeInMinuteToCook = 0;
+  double _difficultyToCook = 0.0;
+  final List<Tag> _tags = [];
 
   void _openBottomSheet() {
     showModalBottomSheet(
@@ -89,7 +91,72 @@ class _AddRecipePageState extends State<AddRecipePage> {
     }
   }
 
-  Future<void> _submitRecipe() async {}
+  Future<void> _addIngredient(String ingredientName, double amount, Unit unit) async {
+    if (ingredientName.isNotEmpty) {
+      // check if ingredient with same name already exists
+      final String newIngredientName = ingredientName.trim().toLowerCase();
+      final bool ingredientExists = _ingredients.any(
+        (existing) => existing.ingredientName.toLowerCase() == newIngredientName
+      );
+      
+      if (ingredientExists) {
+        // show error message if ingredient already exists
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('This ingredient already exists in your recipe'),
+            backgroundColor: Colors.red.shade700,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        // add the new ingredient
+        setState(() {
+          _ingredients.add(
+            Ingredient(
+              ingredientName: ingredientName,
+              amount: amount,
+              unit: unit,
+            ),
+          );
+        });
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  Future<void> _addCookingInstruction(String instruction) async {
+    if (instruction.isNotEmpty) {
+      setState(() {
+        _cookingInstructions.add(instruction);
+      });
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _addTags(List<Tag> tags) async {
+    setState(() {
+      // check if tag already exists
+      for (Tag tag in tags) {
+        bool tagExists = _tags.contains(tag);
+        
+        if (!tagExists) {
+          _tags.add(tag);
+        }
+      }
+    });
+    Navigator.pop(context);
+    }
+
+  Future<void> _submitRecipe(
+    String title,
+    String description,
+    XFile? image,
+    List<Ingredient> ingredients,
+    List<String> cookingInstructions,
+    int timeInMinuteToCook,
+    double difficultyToCook,
+    List<Tag> tags,
+  ) async {}
 
   @override
   Widget build(BuildContext context) {
@@ -247,12 +314,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         child: Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.edit,
-                            color: Theme.of(context).primaryColor,
+                            color: Colors.black,
                             size: 20,
                           ),
                         ),
@@ -279,33 +346,645 @@ class _AddRecipePageState extends State<AddRecipePage> {
   }
 
   Widget _buildIngredients(Size screenSize) {
-    return Container();
+    return Column(
+      children: [
+        Container(
+          width: screenSize.width * 0.7,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 236, 237, 248),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // list of ingredients
+              _ingredients.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        'No ingredients added yet',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: _ingredients
+                          .map((ingredient) => _buildIngredientItem(ingredient))
+                          .toList(),
+                    ),
+              
+              SizedBox(height: 15),
+              
+              // add ingredient button
+              Center(
+                child: _plusButton(
+                  "Add Ingredient", 
+                  () => _showAddIngredientDialog(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
-  Widget _buildIngredientItem() {
-    return SizedBox();
-  }
-
-  Widget _plusButton() {
-    return Container();
+  Widget _buildIngredientItem(Ingredient ingredient) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              '${ingredient.ingredientName} (${ingredient.amount} ${ingredient.unit.name})',
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _ingredients.remove(ingredient);
+              });
+            },
+            child: Icon(Icons.close, color: Colors.red, size: 20),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildCookingInstructions(Size screenSize) {
-    return Container();
+    return Column(
+      children: [
+        Container(
+          width: screenSize.width * 0.7,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 236, 237, 248),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // list of instructions
+              _cookingInstructions.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        'No cooking instructions added yet',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: _cookingInstructions.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final instruction = entry.value;
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 2,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                margin: EdgeInsets.only(right: 10, top: 2),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF00BFA6),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  instruction,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _cookingInstructions.removeAt(index);
+                                  });
+                                },
+                                child: Icon(Icons.close, color: Colors.red, size: 20),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+              SizedBox(height: 15),
+              // add instruction button
+              Center(
+                child: _plusButton(
+                  "Add Instruction", 
+                  () => _showAddInstructionDialog(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildTimeAndDifficulty(Size screenSize) {
-    return Container();
+    return Container(
+      width: screenSize.width * 0.7,
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 236, 237, 248),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // cooking time
+          Text(
+            'Cooking Time (minutes): $_timeInMinuteToCook',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10),
+          Slider(
+            value: _timeInMinuteToCook.toDouble(),
+            min: 0,
+            max: 180,
+            divisions: 36,
+            label: _timeInMinuteToCook.toString(),
+            onChanged: (value) {
+              setState(() {
+                _timeInMinuteToCook = value.toInt();
+              });
+            },
+          ),
+          SizedBox(height: 20),
+          // difficulty
+          Text(
+            'Difficulty Level: ${_difficultyToCook.toStringAsFixed(1)}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10),
+          Slider(
+            value: _difficultyToCook,
+            min: 0,
+            max: 5,
+            divisions: 10,
+            label: _difficultyToCook.toStringAsFixed(1),
+            onChanged: (value) {
+              setState(() {
+                _difficultyToCook = value;
+              });
+            },
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Easy'),
+              Text('Medium'),
+              Text('Hard'),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildTags(Size screenSize) {
-    return Container();
+    return Column(
+      children: [
+        Container(
+          width: screenSize.width * 0.7,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 236, 237, 248),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // display selected tags
+              _tags.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        'No tags added yet',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    )
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _tags.map((tag) => Chip(
+                        label: Text(tag.name),
+                        backgroundColor: Color(0xFF00BFA6).withValues(alpha: 0.2),
+                        deleteIcon: Icon(Icons.close, size: 18),
+                        onDeleted: () {
+                          setState(() {
+                            _tags.remove(tag);
+                          });
+                        },
+                      )).toList(),
+                    ),
+              SizedBox(height: 15),
+              // add tag button
+              Center(
+                child: _plusButton(
+                  "Add Tag", 
+                  () => _showAddTagDialog(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildSubmitButton(Size screenSize) {
-    return MyButton(
-      onPressed: _submitRecipe,
-      text: 'Submit',
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+      child: MyButton(
+        onPressed: () async {
+          await _submitRecipe(
+            _titleController.text,
+            _descriptionController.text,
+            _image,
+            _ingredients,
+            _cookingInstructions,
+            _timeInMinuteToCook,
+            _difficultyToCook,
+            _tags,
+          );
+        },
+        text: 'Submit',
+      ),
+    );
+  }
+
+  Widget _plusButton(String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add, color: Color(0xFF00BFA6)),
+            SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: Color(0xFF00BFA6),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddInstructionDialog(BuildContext context) {
+    final TextEditingController instructionController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Add Cooking Instruction'),
+        content: TextField(
+          controller: instructionController,
+          decoration: InputDecoration(
+            labelText: 'Instruction',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _addCookingInstruction(instructionController.text);
+            },
+            child: Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddIngredientDialog(BuildContext context) {
+    final TextEditingController ingredientNameController = TextEditingController();
+    double amount = 1.0;
+    Unit unit = Unit.g; // Default unit
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Add Ingredient'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ingredient name
+                TextField(
+                  controller: ingredientNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Ingredient Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                
+                // amount
+                Row(
+                  children: [
+                    Text('Amount: '),
+                    Expanded(
+                      child: Slider(
+                        value: amount,
+                        min: 0.1,
+                        max: 10,
+                        divisions: 99,
+                        label: amount.toStringAsFixed(1),
+                        onChanged: (value) {
+                          setDialogState(() {
+                            amount = value;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 50,
+                      child: GestureDetector(
+                        onTap: () {
+                          // show a dialog to enter a numeric value directly
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              final TextEditingController amountController = TextEditingController(
+                                text: amount.toString()
+                              );
+                              return AlertDialog(
+                                title: Text('Enter Amount'),
+                                content: TextField(
+                                  controller: amountController,
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Enter a number',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      // try to parse the entered value
+                                      try {
+                                        double newAmount = double.parse(amountController.text);
+                                        if (newAmount > 0) {
+                                          // update the amount value
+                                          setDialogState(() {
+                                            amount = newAmount > 10 ? 10 : newAmount;
+                                          });
+                                          Navigator.pop(context);
+                                        }
+                                      } catch (e) {
+                                        // invalid number, show an error message
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Please enter a valid number')),
+                                        );
+                                      }
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade400),
+                          ),
+                          child: Text(
+                            amount.toStringAsFixed(1),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF00BFA6),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                // unit selection
+                DropdownButtonFormField<Unit>(
+                  value: unit,
+                  decoration: InputDecoration(
+                    labelText: 'Unit',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: Unit.values.map((Unit unitValue) {
+                    return DropdownMenuItem<Unit>(
+                      value: unitValue,
+                      child: Text(unitValue.name),
+                    );
+                  }).toList(),
+                  onChanged: (Unit? newValue) {
+                    if (newValue != null) {
+                      setDialogState(() {
+                        unit = newValue;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: ()  async {
+                await _addIngredient(ingredientNameController.text.trim().toLowerCase(), amount, unit);
+              },
+              child: Text('Add'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddTagDialog(BuildContext context) {
+    // Set to track selected tags in this dialog
+    final Set<Tag> selectedTags = <Tag>{};
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: Text('Select Tags'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Selected Tags:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  selectedTags.isEmpty
+                      ? Text(
+                          'No tags selected',
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: selectedTags.map((tag) => Chip(
+                            label: Text(tag.name),
+                            backgroundColor: Color(0xFF00BFA6).withValues(alpha: 0.2),
+                            deleteIcon: Icon(Icons.close, size: 18),
+                            onDeleted: () {
+                              setDialogState(() {
+                                selectedTags.remove(tag);
+                              });
+                            },
+                          )).toList(),
+                        ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Available Tags:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: Tag.values.map((tag) => GestureDetector(
+                      onTap: () {
+                        setDialogState(() {
+                          if (selectedTags.contains(tag)) {
+                            selectedTags.remove(tag);
+                          } else {
+                            selectedTags.add(tag);
+                          }
+                        });
+                      },
+                      child: Chip(
+                        label: Text(tag.name),
+                        backgroundColor: selectedTags.contains(tag) 
+                            ? Color(0xFF00BFA6).withValues(alpha: 0.2)
+                            : _tags.contains(tag)
+                                ? Color(0xFF00BFA6).withValues(alpha: 0.1) 
+                                : Colors.grey[200],
+                      ),
+                    )).toList(),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (selectedTags.isNotEmpty) {
+                    await _addTags(selectedTags.toList());
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Please select at least one tag'),
+                        backgroundColor: Colors.red.shade700,
+                      ),
+                    );
+                  }
+                },
+                child: Text('Add'),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
