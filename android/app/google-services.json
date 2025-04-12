@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "39164524560",
+    "project_id": "food-ingredient-recognition",
+    "storage_bucket": "food-ingredient-recognition.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39164524560:android:f5c77b442643ec346cb295",
+        "android_client_info": {
+          "package_name": "com.example.fyp_wyc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwaFhTyGmq6G1lKzul74whDjdQ0Yxg4Cg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
