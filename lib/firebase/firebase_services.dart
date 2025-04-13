@@ -1,13 +1,16 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_datacheck.dart';
 import 'package:fyp_wyc/model/user.dart';
-import 'package:image_picker/image_picker.dart';
 
 class FirebaseServices {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   final FirebaseDataCheck _firebaseDataCheck = FirebaseDataCheck();
 
   auth.UserCredential? userCredential;
@@ -149,8 +152,9 @@ class FirebaseServices {
     }
   }
 
-  Future<Map<String, dynamic>> updateUser(String email, XFile? imageFile, String newName, String newAboutMe, String newGender) async {
+  Future<Map<String, dynamic>> updateUser(User user) async {
     try {
+      await _userCollection.doc(user.email).update(user.toJson());
       return {
         'success': true,
         'message': 'User updated successfully',
@@ -164,4 +168,22 @@ class FirebaseServices {
   }
 
   CollectionReference<Map<String, dynamic>> get _userCollection => _firebaseFirestore.collection('users');
+
+  Future<String> uploadImage(String email, String imagePath) async {
+    try {
+      final imageUrl = await _firebaseStorage.ref().child('users/$email').putFile(File(imagePath));
+      return await imageUrl.ref.getDownloadURL();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Future<bool> checkUserExistsByEmail(String email) async {
+    try {
+      final userData = await _userCollection.doc(email).get();
+      return userData.exists;
+    } catch (e) {
+      return false;
+    }
+  }
 }

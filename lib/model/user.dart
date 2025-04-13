@@ -70,4 +70,38 @@ class User {
       'commentIDs': commentIDs,
     };
   }
+
+  User copyWith({
+    String? email,
+    String? phone,
+    String? username,
+    String? createdAt,
+    String? role,
+    String? aboutMe,
+    String? gender,
+    String? ageRange,
+    String? avatarUrl,
+    List<String>? savedRecipes,
+    List<String>? addedRecipes,
+    List<String>? searchHistory,
+    List<String>? recipeHistory,
+    List<String>? commentIDs,
+  }) {
+    return User(
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      username: username ?? this.username,
+      createdAt: createdAt ?? this.createdAt,
+      role: role ?? this.role,
+      aboutMe: aboutMe ?? this.aboutMe,
+      gender: gender ?? this.gender,
+      ageRange: ageRange ?? this.ageRange,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      savedRecipes: savedRecipes ?? this.savedRecipes,
+      addedRecipes: addedRecipes ?? this.addedRecipes,
+      searchHistory: searchHistory ?? this.searchHistory,
+      recipeHistory: recipeHistory ?? this.recipeHistory,
+      commentIDs: commentIDs ?? this.commentIDs,
+    );
+  }
 }

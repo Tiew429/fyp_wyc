@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/utils/my_avatar.dart';
@@ -21,11 +22,22 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   User? user;
+  late Image? userAvatar;
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
+    
+    if (user != null) {
+      userAvatar = UserStore.currentUserAvatar;
+      
+      // if avatar is not in UserStore but URL exists, load it from network
+      if (userAvatar == null && user!.avatarUrl.isNotEmpty) {
+        userAvatar = ImageFunctions.getAvatarInFuture(user!.avatarUrl);
+        UserStore.setCurrentUserAvatar(userAvatar!);
+      }
+    }
   }
 
   Future<void> _logOut() async {
@@ -148,6 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
               alignment: Alignment.center,
               child: MyAvatar(
                 radius: screenSize.width * 0.10,
+                image: userAvatar,
               ),
             ),
           ],

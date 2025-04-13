@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/utils/my_avatar.dart';
 import 'package:fyp_wyc/utils/my_recipe_box.dart';
 import 'package:fyp_wyc/utils/my_search_bar.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback onAvatarTap;
+
+  const HomePage({
+    super.key,
+    required this.onAvatarTap,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late Image? userAvatar;
   final TextEditingController _searchController = TextEditingController();
   bool isSaved = false; // for testing purposes
+
+  @override
+  void initState() {
+    super.initState();
+    userAvatar = UserStore.currentUserAvatar;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +39,10 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // top-left user avatar
-            MyAvatar(),
+            MyAvatar(
+              onTap: widget.onAvatarTap,
+              image: userAvatar,
+            ),
             SizedBox(width: screenSize.width * 0.05),
             // top search bar
             SizedBox(

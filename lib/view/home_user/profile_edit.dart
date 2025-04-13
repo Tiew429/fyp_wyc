@@ -1,5 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:fyp_wyc/firebase/firebase_services.dart';
+import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/functions/my_snackbar.dart';
 import 'package:fyp_wyc/main.dart';
@@ -22,6 +24,7 @@ class ProfileEditPage extends StatefulWidget {
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
   late User currentUser;
+
   bool isSaveEnabled = false;
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _imageFile;
@@ -60,8 +63,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     String newName = _displayNameController.text;
     String newAboutMe = _aboutMeController.text;
 
-    FirebaseServices firebaseServices = FirebaseServices();
-    final response = await firebaseServices.updateUser(email, _imageFile, newName, newAboutMe, _gender);
+    final response = await UserStore.updateUser(email, _imageFile?.path, newName, newAboutMe, _gender);
 
     if (response['success']) {
       setState(() {
@@ -128,6 +130,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       children: [
         MyAvatar(
           radius: screenSize.width * 0.13,
+          image: _imageFile != null ? Image.file(File(_imageFile!.path)) : UserStore.currentUserAvatar,
         ),
         Positioned(
           bottom: 0,

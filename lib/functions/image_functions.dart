@@ -44,4 +44,16 @@ class ImageFunctions {
       return XFile(image.path);
     }
   }
+
+  static Image getAvatarInFuture(String url) {
+    return Image.network(url,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(child: CircularProgressIndicator());
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Icon(Icons.person, color: Colors.grey[800]);
+      },
+    );
+  }
 }

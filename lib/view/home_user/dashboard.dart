@@ -25,7 +25,7 @@ class _DashboardState extends State<Dashboard> {
 
   // declare pages list but don't initialize it yet
   List<Widget> _pages = [
-    HomePage(),
+    HomePage(onAvatarTap: () {}),
     SavedPage(),
     ScanPage(),
     AddRecipePage(),
@@ -38,14 +38,32 @@ class _DashboardState extends State<Dashboard> {
     _selectedIndex = 0;
     user = widget.user;
     
-    // update pages if user is logged in
+    // update pages
+    // if user is logged in, update display profile view page for logged user
+    // also the saved page and add recipe page too
     if (user != null) {
       _pages = [
-        HomePage(),
+        HomePage(onAvatarTap: () {
+          setState(() {
+            _selectedIndex = 4;
+          });
+        }),
         SavedPage(),
         ScanPage(),
-        AddRecipePage(user: user),
+        AddRecipePage(),
         ProfilePage(user: user),
+      ];
+    } else {
+      _pages = [
+        HomePage(onAvatarTap: () {
+          setState(() {
+            _selectedIndex = 4;
+          });
+        }),
+        SavedPage(),
+        ScanPage(),
+        AddRecipePage(),
+        ProfilePage(),
       ];
     }
   }
