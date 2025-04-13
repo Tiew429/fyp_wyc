@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_datacheck.dart';
+import 'package:fyp_wyc/firebase/firebase_options.dart';
 import 'package:fyp_wyc/model/user.dart';
 
 class FirebaseServices {
@@ -14,6 +17,17 @@ class FirebaseServices {
   final FirebaseDataCheck _firebaseDataCheck = FirebaseDataCheck();
 
   auth.UserCredential? userCredential;
+
+  initializeFirebase() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirebaseAppCheck.instance.activate(
+      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.appAttest,
+    );
+  }
 
   Future<Map<String, dynamic>> signUp(String email, String phone, String username, String password) async {
     try {

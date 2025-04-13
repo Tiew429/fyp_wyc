@@ -2,21 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/my_shared_preferences.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/firebase/firebase_services.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
 import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await FirebaseServices().initializeFirebase();
 
   runApp(const MainApp());
 }
