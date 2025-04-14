@@ -32,7 +32,6 @@ class _SavedPageState extends State<SavedPage> with SingleTickerProviderStateMix
   bool isSavedTab = true;
   bool isLoading = false;
   late AnimationController _animationController;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -48,14 +47,6 @@ class _SavedPageState extends State<SavedPage> with SingleTickerProviderStateMix
       duration: Duration(milliseconds: 300),
       vsync: this,
     );
-
-    _animation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
   }
 
   @override
