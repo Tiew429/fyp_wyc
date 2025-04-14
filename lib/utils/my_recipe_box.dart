@@ -7,6 +7,7 @@ class MyRecipeBox extends StatelessWidget {
   final bool isSaved;
   final VoidCallback onSave;
   final VoidCallback onTap;
+  final bool showSaveButton;
 
   const MyRecipeBox({
     super.key,
@@ -16,6 +17,7 @@ class MyRecipeBox extends StatelessWidget {
     this.isSaved = false,
     required this.onSave,
     required this.onTap,
+    this.showSaveButton = true,
   });
 
   @override
@@ -38,32 +40,68 @@ class MyRecipeBox extends StatelessWidget {
                       width: double.infinity,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
-                        return Center(child: CircularProgressIndicator(
-                          color: Color(0xFF00BFA6),
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                              : null,
-                        ));
+                        return Container(
+                          color: Colors.grey[100],
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  color: Color(0xFF00BFA6),
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Loading image...',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
                       },
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: Colors.grey[200],
-                          child: Center(child: Icon(Icons.restaurant, color: Colors.grey)),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.restaurant, color: Colors.grey, size: 32),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Image not available',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),
                   ),
                 ),
-                Positioned(
-                  right: 0,
-                  child: IconButton(
-                    onPressed: onSave,
-                    icon: Icon(
-                      isSaved ? Icons.favorite : Icons.favorite_border,
-                      color: isSaved ? Colors.red : Colors.black,
+                if (showSaveButton)
+                  Positioned(
+                    right: 0,
+                    child: IconButton(
+                      onPressed: onSave,
+                      icon: Icon(
+                        isSaved ? Icons.favorite : Icons.favorite_border,
+                        color: isSaved ? Colors.red : Colors.white,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

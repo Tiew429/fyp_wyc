@@ -10,11 +10,43 @@ class Ingredient {
   });
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
-    return Ingredient(
-      ingredientName: json['ingredientName'],
-      amount: json['amount'],
-      unit: Unit.values[json['unit']],
-    );
+    try {
+      Unit parsedUnit = Unit.g;
+      if (json['unit'] != null) {
+        if (json['unit'] is String) {
+          try {
+            final unitString = json['unit'].toString().toLowerCase();
+            parsedUnit = Unit.values.firstWhere(
+              (u) => u.name.toLowerCase() == unitString,
+              orElse: () => Unit.g,
+            );
+          } catch (_) {
+            parsedUnit = Unit.g;
+          }
+        } else if (json['unit'] is int) {
+          final unitIndex = json['unit'] as int;
+          if (unitIndex >= 0 && unitIndex < Unit.values.length) {
+            parsedUnit = Unit.values[unitIndex];
+          }
+        }
+      }
+      
+      return Ingredient(
+        ingredientName: json['ingredientName'] ?? '',
+        amount: json['amount'] is double 
+            ? json['amount'] 
+            : json['amount'] is int 
+                ? (json['amount'] as int).toDouble() 
+                : 0.0,
+        unit: parsedUnit,
+      );
+    } catch (e) {
+      return Ingredient(
+        ingredientName: json['ingredientName'] ?? 'Unknown',
+        amount: 0,
+        unit: Unit.g,
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -33,7 +65,8 @@ enum Unit {
   kg,
   pc,
   tsp,
-  tbsp;
+  tbsp,
+  cup;
 
   String get unitName => name;
 }

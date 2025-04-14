@@ -2,7 +2,8 @@ enum ViewData {
   auth,
   forgot,
   profileEdit,
-  dashboard;
+  dashboard,
+  recipeDetails;
 
   String get path => name;
 }

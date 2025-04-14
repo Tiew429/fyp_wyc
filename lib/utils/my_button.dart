@@ -41,8 +41,13 @@ class MyButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon ?? SizedBox.shrink(),
-          SizedBox(width: 10),
+          icon != null ? Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon!,
+              SizedBox(width: 10),
+            ],
+          ) : SizedBox.shrink(),
           isLoading ?? false ? SizedBox(
             width: 20,
             height: 20,

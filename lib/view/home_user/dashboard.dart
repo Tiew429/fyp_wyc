@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/home_user/home_pages/add_recipe.dart';
 import 'package:fyp_wyc/view/home_user/home_pages/home.dart';
@@ -9,10 +10,12 @@ import 'package:fyp_wyc/view/home_user/home_pages/profile.dart';
 
 class Dashboard extends StatefulWidget {
   final User? user;
+  final List<Recipe>? recipeList;
   
   const Dashboard({
     super.key, 
     this.user,
+    this.recipeList,
   });
 
   @override
@@ -22,11 +25,12 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   late int _selectedIndex;
   User? user;
+  List<Recipe>? recipeList = [];
 
   // declare pages list but don't initialize it yet
   List<Widget> _pages = [
-    HomePage(onAvatarTap: () {}),
-    SavedPage(),
+    HomePage(onAvatarTap: () {}, user: null),
+    SavedPage(user: null, recipeLists: null),
     ScanPage(),
     AddRecipePage(),
     ProfilePage(),
@@ -37,7 +41,8 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     _selectedIndex = 0;
     user = widget.user;
-    
+    recipeList = widget.recipeList;
+
     // update pages
     // if user is logged in, update display profile view page for logged user
     // also the saved page and add recipe page too
@@ -47,10 +52,10 @@ class _DashboardState extends State<Dashboard> {
           setState(() {
             _selectedIndex = 4;
           });
-        }),
-        SavedPage(),
+        }, user: user, recipeList: recipeList),
+        SavedPage(user: user, recipeLists: recipeList),
         ScanPage(),
-        AddRecipePage(),
+        AddRecipePage(user: user),
         ProfilePage(user: user),
       ];
     } else {
@@ -59,8 +64,16 @@ class _DashboardState extends State<Dashboard> {
           setState(() {
             _selectedIndex = 4;
           });
-        }),
-        SavedPage(),
+        }, user: user, recipeList: recipeList),
+        SavedPage(
+          user: user, 
+          recipeLists: recipeList, 
+          onEmptyButtonClick: () {
+            setState(() {
+              _selectedIndex = 0;
+            });
+          },
+        ),
         ScanPage(),
         AddRecipePage(),
         ProfilePage(),

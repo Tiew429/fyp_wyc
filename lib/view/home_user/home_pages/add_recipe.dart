@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
+import 'package:fyp_wyc/event/recipe_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
+import 'package:fyp_wyc/functions/my_snackbar.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/ingredient.dart';
 import 'package:fyp_wyc/model/recipe.dart';
@@ -25,7 +27,8 @@ class AddRecipePage extends StatefulWidget {
 }
 
 class _AddRecipePageState extends State<AddRecipePage> {
-  final TextEditingController _titleController = TextEditingController();
+  late User? user;
+  final TextEditingController _recipeNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _image;
@@ -35,6 +38,14 @@ class _AddRecipePageState extends State<AddRecipePage> {
   int _timeInMinuteToCook = 0;
   double _difficultyToCook = 0.0;
   final List<Tag> _tags = [];
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+  }
 
   void _openBottomSheet() {
     showModalBottomSheet(
@@ -145,24 +156,109 @@ class _AddRecipePageState extends State<AddRecipePage> {
       }
     });
     Navigator.pop(context);
+  }
+
+  bool _validation() {
+    // first validate the form fields
+    if (!_formKey.currentState!.validate()) {
+      return false;
+    }
+    
+    // validate cover image
+    if (_image == null) {
+      MySnackBar.showSnackBar('Please add a cover image for your recipe');
+      return false;
+    }
+    
+    // validate ingredients list
+    if (_ingredients.isEmpty) {
+      MySnackBar.showSnackBar('Please add at least one ingredient to your recipe');
+      return false;
+    }
+    
+    // validate cooking instructions
+    if (_cookingInstructions.isEmpty) {
+      MySnackBar.showSnackBar('Please add at least one cooking instruction');
+      return false;
+    }
+    
+    // validate time
+    if (_timeInMinuteToCook <= 0) {
+      MySnackBar.showSnackBar('Please set a cooking time greater than zero');
+      return false;
+    }
+    
+    // validate difficulty
+    if (_difficultyToCook <= 0) {
+      MySnackBar.showSnackBar('Please set a difficulty level greater than zero');
+      return false;
+    }
+    
+    // validate tags
+    if (_tags.isEmpty) {
+      MySnackBar.showSnackBar('Please add at least one tag to your recipe');
+      return false;
     }
 
-  Future<void> _submitRecipe(
-    String title,
-    String description,
-    XFile? image,
-    List<Ingredient> ingredients,
-    List<String> cookingInstructions,
-    int timeInMinuteToCook,
-    double difficultyToCook,
-    List<Tag> tags,
-  ) async {}
+    return true;
+  }
+
+  Future<void> _submitRecipe() async {
+    if (!_validation()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    String recipeName = _recipeNameController.text;
+    String description = _descriptionController.text;
+    String imageUrl = _image!.path;
+    List<Tag> tags = _tags;
+    List<Ingredient> ingredients = _ingredients;
+    List<String> cookingInstructions = _cookingInstructions;
+
+    // create recipe
+    Recipe recipe = Recipe(
+      recipeID: '',
+      recipeName: recipeName,
+      description: description,
+      imageUrl: imageUrl,
+      tags: tags,
+      ingredients: ingredients,
+      steps: cookingInstructions,
+      authorEmail: user!.email,
+      timeToCookInMinute: _timeInMinuteToCook,
+      difficulty: _difficultyToCook,
+    );
+
+    final response = await RecipeStore.addRecipe(recipe);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    MySnackBar.showSnackBar(response['message']);
+
+    if (response['success']) {
+      // clear the form fields
+      _recipeNameController.clear();
+      _descriptionController.clear();
+      _ingredients.clear();
+      _cookingInstructions.clear();
+      _tags.clear();
+      _image = null;
+      _timeInMinuteToCook = 0;
+      _difficultyToCook = 0.0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return widget.user == null ? _buildNoLogInUserPage(screenSize) : _buildLogInUserPage(screenSize);
+    return user == null ? _buildNoLogInUserPage(screenSize) : _buildLogInUserPage(screenSize);
   }
 
   Widget _buildNoLogInUserPage(Size screenSize) {
@@ -214,40 +310,43 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   Widget _buildLogInUserPage(Size screenSize) {
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Create Recipe',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Create Recipe',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-          // recipe title
-          _buildTitle('Recipe Name'),
-          _buildRecipeName(screenSize),
-          // cover image
-          _buildTitle('Add Cover Image'),
-          _buildCoverImageContainer(screenSize),
-          // description
-          _buildTitle('Recipe Description'),
-          _buildDescriptionTextField(screenSize),
-          // ingredients
-          _buildTitle('Recipe Ingredients'),
-          _buildIngredients(screenSize),
-          // cooking instructions
-          _buildTitle('Cooking Instructions'),
-          _buildCookingInstructions(screenSize),
-          // time and difficulty
-          _buildTitle('Time and Difficulty'),
-          _buildTimeAndDifficulty(screenSize),
-          // tags
-          _buildTitle('Tags'),
-          _buildTags(screenSize),
-          // submit button
-          _buildSubmitButton(screenSize),
-        ],
+            SizedBox(height: 20),
+            // recipe title
+            _buildTitle('Recipe Name'),
+            _buildRecipeName(screenSize),
+            // cover image
+            _buildTitle('Add Cover Image'),
+            _buildCoverImageContainer(screenSize),
+            // description
+            _buildTitle('Recipe Description'),
+            _buildDescriptionTextField(screenSize),
+            // ingredients
+            _buildTitle('Recipe Ingredients'),
+            _buildIngredients(screenSize),
+            // cooking instructions
+            _buildTitle('Cooking Instructions'),
+            _buildCookingInstructions(screenSize),
+            // time and difficulty
+            _buildTitle('Time and Difficulty'),
+            _buildTimeAndDifficulty(screenSize),
+            // tags
+            _buildTitle('Tags'),
+            _buildTags(screenSize),
+            // submit button
+            _buildSubmitButton(screenSize),
+          ],
+        ),
       ),
     );
   }
@@ -268,10 +367,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.7,
       child: MyTextField(
-        controller: _titleController,
+        controller: _recipeNameController,
         hintText: 'Enter recipe name',
         borderDisplay: false,
         backgroundColor: const Color.fromARGB(255, 236, 237, 248),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Recipe name is required';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -341,6 +446,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
         borderDisplay: false,
         backgroundColor: const Color.fromARGB(255, 236, 237, 248),
         maxLines: 5,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Recipe description is required';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -375,9 +486,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                           .map((ingredient) => _buildIngredientItem(ingredient))
                           .toList(),
                     ),
-              
               SizedBox(height: 15),
-              
               // add ingredient button
               Center(
                 child: _plusButton(
@@ -652,18 +761,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
       child: MyButton(
-        onPressed: () async {
-          await _submitRecipe(
-            _titleController.text,
-            _descriptionController.text,
-            _image,
-            _ingredients,
-            _cookingInstructions,
-            _timeInMinuteToCook,
-            _difficultyToCook,
-            _tags,
-          );
-        },
+        onPressed: () async => await _submitRecipe(),
+        isLoading: _isLoading,
         text: 'Submit',
       ),
     );
@@ -750,7 +849,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                
                 // amount
                 Row(
                   children: [
@@ -759,7 +857,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       child: Slider(
                         value: amount,
                         min: 0.1,
-                        max: 10,
+                        max: 1000,
                         divisions: 99,
                         label: amount.toStringAsFixed(1),
                         onChanged: (value) {
@@ -770,7 +868,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       ),
                     ),
                     SizedBox(
-                      width: 50,
+                      width: 65,
                       child: GestureDetector(
                         onTap: () {
                           // show a dialog to enter a numeric value directly
@@ -787,8 +885,27 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
-                                    hintText: 'Enter a number',
+                                    hintText: 'Enter a number or fraction (e.g., 1.5 or 3/4)',
                                   ),
+                                  onChanged: (value) {
+                                    // parse the value as a decimal number
+                                    // check if the input contains a fraction (e.g., "3/4")
+                                    if (value.contains('/')) {
+                                      final parts = value.split('/');
+                                      if (parts.length == 2) {
+                                        final numerator = double.parse(parts[0].trim());
+                                        final denominator = double.parse(parts[1].trim());
+                                        if (denominator != 0) {
+                                          // convert fraction to decimal
+                                          final decimal = numerator / denominator;
+                                          amountController.text = decimal.toString();
+                                        }
+                                      }
+                                    } else {
+                                      // just validate it's a valid number
+                                      double.parse(value);
+                                    }
+                                  },
                                 ),
                                 actions: [
                                   TextButton(
@@ -803,7 +920,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                         if (newAmount > 0) {
                                           // update the amount value
                                           setDialogState(() {
-                                            amount = newAmount > 10 ? 10 : newAmount;
+                                            amount = newAmount > 1000 ? 1000 : newAmount;
                                           });
                                           Navigator.pop(context);
                                         }

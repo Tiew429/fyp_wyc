@@ -101,7 +101,7 @@ class UserStore {
       // if image file is not null, upload image to firebase storage
       String imageUrl = '';
       if (imagePath != null) {
-        imageUrl = await firebaseServices.uploadImage(email, imagePath);
+        imageUrl = await firebaseServices.uploadAvatar(email, imagePath);
       }
 
       // update user

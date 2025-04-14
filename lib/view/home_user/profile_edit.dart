@@ -31,6 +31,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final _displayNameController = TextEditingController();
   final _aboutMeController = TextEditingController();
   late String _gender;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -54,11 +55,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       final croppedImage = await ImageFunctions.cropImage(pickedFile);
       setState(() {
         _imageFile = croppedImage;
+        _onChangeSaveable();
       });
     }
   }
 
   Future<void> _saveUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
     String email = currentUser.email;
     String newName = _displayNameController.text;
     String newAboutMe = _aboutMeController.text;
@@ -70,6 +76,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         currentUser.username = newName;
         currentUser.aboutMe = newAboutMe;
         currentUser.gender = _gender;
+        isLoading = false;
       });
       MySnackBar.showSnackBar(response['message']);
       navigatorKey.currentContext!.pop();
@@ -105,21 +112,31 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildAvatarWithCameraSection(screenSize),
-                  _buildDisplayNameSection(screenSize),
-                  _buildAboutMeSection(screenSize),
-                  _buildGenderSection(screenSize),
-                ],
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildAvatarWithCameraSection(screenSize),
+                      _buildDisplayNameSection(screenSize),
+                      _buildAboutMeSection(screenSize),
+                      _buildGenderSection(screenSize),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
+            if (isLoading)
+              Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF00BFA6),
+                ),
+              ),
+          ],
         ),
       ),
     );

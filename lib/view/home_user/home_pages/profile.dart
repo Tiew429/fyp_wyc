@@ -6,6 +6,7 @@ import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/utils/my_avatar.dart';
 import 'package:fyp_wyc/functions/my_snackbar.dart';
+import 'package:fyp_wyc/view/no_log_in/no_log_in.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -60,64 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return user == null ? _buildNoLogInUserPage(screenSize) : _buildLoggedUserPage(screenSize);
-  }
-
-  // will display for guest user
-  Widget _buildNoLogInUserPage(Size screenSize) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: 20),
-        Icon(
-          Icons.account_circle,
-          size: 100,
-          color: Colors.grey,
-        ),
-        SizedBox(height: 20),
-        Text(
-          'You are not logged in',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 10),
-        Text(
-          'Log in to access your profile and saved recipes',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-        ),
-        SizedBox(height: 30),
-        ElevatedButton(
-          onPressed: () {
-            navigatorKey.currentContext!.push('/${ViewData.auth.path}');
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 26, 218, 128),
-            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-          ),
-          child: Text(
-            'Login / Sign Up',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        SizedBox(height: 50),
-        // App info for guests
-        _buildOptionList(screenSize, false),
-        SizedBox(height: 20),
-        Text('Version 1.0'),
-      ],
-    );
+    return user == null ? NoLogInPage() : _buildLoggedUserPage(screenSize);
   }
 
   // will display if the user is logged in

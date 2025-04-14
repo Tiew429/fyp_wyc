@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fyp_wyc/event/user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_datacheck.dart';
 import 'package:fyp_wyc/firebase/firebase_options.dart';
+import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
 
 class FirebaseServices {
@@ -18,7 +19,7 @@ class FirebaseServices {
 
   auth.UserCredential? userCredential;
 
-  initializeFirebase() async {
+  static Future<void> initializeFirebase() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
@@ -181,11 +182,146 @@ class FirebaseServices {
     }
   }
 
-  CollectionReference<Map<String, dynamic>> get _userCollection => _firebaseFirestore.collection('users');
+  Future<Map<String, dynamic>> addRecipe(Recipe recipe) async {
+    try {
+      // check the number of recipe in firestore, then define the recipe id
+      final recipeData = await _recipeCollection.get();
+      int recipeCount = recipeData.size;
 
-  Future<String> uploadImage(String email, String imagePath) async {
+      recipe.recipeID = 'R-${recipeCount + 1}';
+
+      // add recipe to recipe collection
+      await _recipeCollection.doc(recipe.recipeID).set(recipe.toJson());
+
+      // upload the image to firebase storage
+      final imageUrl = await uploadRecipeImage(recipe.recipeID, recipe.imageUrl);
+
+      // update the recipe with the image url
+      await _recipeCollection.doc(recipe.recipeID).update({
+        'imageUrl': imageUrl,
+      });
+
+      // then add recipe to users (author) collection also
+      await _userCollection.doc(recipe.authorEmail).update({
+        'addedRecipes': FieldValue.arrayUnion([recipe.recipeID]),
+      });
+
+      return {
+        'success': true,
+        'message': 'Recipe added successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when adding recipe: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getRecipeList() async {
+    try {
+      final recipeData = await _recipeCollection.get();
+      
+      if (recipeData.docs.isEmpty) {
+        return {
+          'success': true,
+          'message': 'No recipes found',
+          'recipeList': <Recipe>[],
+        };
+      }
+      
+      final List<Recipe> recipeList = [];
+      
+      for (var doc in recipeData.docs) {
+        final data = doc.data();
+        final recipe = Recipe.fromJson(data);
+        recipeList.add(recipe);
+      }
+      
+      return {
+        'success': true,
+        'message': 'Recipe list fetched successfully',
+        'recipeList': recipeList,
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred when fetching recipe list: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> saveRecipe(String recipeID) async {
+    try {
+      // get current user
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null) {
+        return {
+          'success': false,
+          'message': 'User not logged in',
+        };
+      }
+
+      // update user saved recipes
+      await _userCollection.doc(currentUser.email).update({
+        'savedRecipes': FieldValue.arrayUnion([recipeID]),
+      });
+
+      return {
+        'success': true,
+        'message': 'Recipe saved successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when saving recipe: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> unsaveRecipe(String recipeID) async {
+    try {
+      // get current user
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null) {
+        return {
+          'success': false,
+          'message': 'User not logged in',
+        };
+      }
+
+      // update user saved recipes
+      await _userCollection.doc(currentUser.email).update({
+        'savedRecipes': FieldValue.arrayRemove([recipeID]),
+      });
+
+      return {
+        'success': true,
+        'message': 'Recipe unsaved successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when unsaving recipe: $e',
+      };
+    }
+  }
+
+  CollectionReference<Map<String, dynamic>> get _userCollection => _firebaseFirestore.collection('users');
+  CollectionReference<Map<String, dynamic>> get _recipeCollection => _firebaseFirestore.collection('recipes');
+
+  Future<String> uploadAvatar(String email, String imagePath) async {
     try {
       final imageUrl = await _firebaseStorage.ref().child('users/$email').putFile(File(imagePath));
+      return await imageUrl.ref.getDownloadURL();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Future<String> uploadRecipeImage(String recipeID, String imagePath) async {
+    try {
+      final imageUrl = await _firebaseStorage.ref().child('recipes/$recipeID').putFile(File(imagePath));
       return await imageUrl.ref.getDownloadURL();
     } catch (e) {
       return '';

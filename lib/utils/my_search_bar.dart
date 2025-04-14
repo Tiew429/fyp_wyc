@@ -4,12 +4,14 @@ class MySearchBar extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final Function(String)? onChanged;
+  final bool isClearable;
 
   const MySearchBar({
     super.key,
     required this.controller,
     required this.hintText,
     this.onChanged,
+    this.isClearable = true,
   });
 
   @override
@@ -19,12 +21,12 @@ class MySearchBar extends StatelessWidget {
       onChanged: onChanged,
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.search),
-        suffixIcon: IconButton(
+        suffixIcon: isClearable ? IconButton(
           onPressed: () {
             controller.clear();
           }, 
           icon: Icon(Icons.cancel),
-        ),
+        ) : SizedBox.shrink(),
         hintText: hintText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25),
