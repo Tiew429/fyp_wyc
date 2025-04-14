@@ -5,7 +5,8 @@ enum ViewData {
   dashboard,
   recipeDetails,
   scanning,
-  scanResult;
+  scanResult,
+  aboutActivity;
 
   String get path => name;
 }

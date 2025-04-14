@@ -56,7 +56,7 @@ class _DashboardState extends State<Dashboard> {
         SavedPage(user: user, recipeLists: recipeList),
         ScanPage(),
         AddRecipePage(user: user),
-        ProfilePage(user: user),
+        ProfilePage(user: user, recipes: recipeList),
       ];
     } else {
       _pages = [
@@ -76,7 +76,7 @@ class _DashboardState extends State<Dashboard> {
         ),
         ScanPage(),
         AddRecipePage(),
-        ProfilePage(),
+        ProfilePage(recipes: recipeList),
       ];
     }
   }

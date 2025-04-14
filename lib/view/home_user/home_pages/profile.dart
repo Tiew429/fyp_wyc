@@ -3,18 +3,21 @@ import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/main.dart';
+import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/utils/my_avatar.dart';
-import 'package:fyp_wyc/functions/my_snackbar.dart';
+import 'package:fyp_wyc/utils/my_recipe_box.dart';
 import 'package:fyp_wyc/view/no_log_in/no_log_in.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfilePage extends StatefulWidget {
   final User? user;
+  final List<Recipe>? recipes;
 
   const ProfilePage({
     super.key, 
     this.user,
+    this.recipes,
   });
 
   @override
@@ -24,12 +27,19 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   User? user;
   late Image? userAvatar;
+  List<Recipe>? recipes;
+  List<Recipe>? userAddedRecipes;
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
-    
+    recipes = widget.recipes;
+    userAddedRecipes = user?.addedRecipes
+        .map((e) => recipes?.firstWhere((recipe) => recipe.recipeID == e))
+        .whereType<Recipe>()
+        .toList();
+
     if (user != null) {
       userAvatar = LocalUserStore.currentUserAvatar;
       
@@ -38,22 +48,6 @@ class _ProfilePageState extends State<ProfilePage> {
         userAvatar = ImageFunctions.getAvatarInFuture(user!.avatarUrl);
         LocalUserStore.setCurrentUserAvatar(userAvatar!);
       }
-    }
-  }
-
-  Future<void> _logOut() async {
-    try {
-      // clear current user data in app event bus, firebase auth and shared preferences
-      final response = await LocalUserStore.logoutUser();
-  
-      // logout
-      if (response['success']) {
-        navigatorKey.currentContext!.go('/${ViewData.auth.path}');
-      } else {
-        MySnackBar.showSnackBar('Failed to logout: ${response['message']}');
-      }
-    } catch (e) {
-      MySnackBar.showSnackBar('An error occurred during logout');
     }
   }
 
@@ -69,6 +63,14 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        AppBar(
+          actions: [
+            IconButton(
+              onPressed: () => navigatorKey.currentContext!.push('/${ViewData.aboutActivity.path}', extra: user),
+              icon: const Icon(Icons.menu),
+            ),
+          ],
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -109,52 +111,40 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ],
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Divider(),
+        ),
+        _buildRecipeIdeas(),
         SizedBox(height: 50),
-        // services and policy options
-        _buildOptionList(screenSize, true),
-        SizedBox(height: 50),
-        // app version
-        Text('Version 1.0'),
       ],
     );
   }
 
-  Widget _buildOptionList(Size screenSize, bool isLoggedIn) {
-    return Container(
-      width: screenSize.width * 0.9,
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 236, 237, 248),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {},
-              child: Text('Contact Us'),
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {},
-              child: Text('Terms of Service'),
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {},
-              child: Text('Privacy Policy'),
-            ),
-            SizedBox(height: 20),
-            isLoggedIn ? GestureDetector(
-              onTap: () async => await _logOut(),
-              child: Text('Log Out'),
-            ) : SizedBox(),
-            SizedBox(height: 50), // just a dummy space
-          ],
+  Widget _buildRecipeIdeas() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Recipe Ideas',
+          style: TextStyle(
+            color: Color.fromARGB(255, 0, 123, 167),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
+        SizedBox(height: 16.0),
+        _buildRecipeIdeasList(),
+      ],
     );
+  }
+
+  Widget _buildRecipeIdeasList() {
+    if (userAddedRecipes == null || userAddedRecipes!.isEmpty) {
+      return Center(
+        child: Text('No recipe ideas yet'),
+      );
+    }
+    
+    return Container();
   }
 }

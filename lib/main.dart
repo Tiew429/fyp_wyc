@@ -8,6 +8,7 @@ import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
+import 'package:fyp_wyc/view/home_user/about_activity.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
 import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:fyp_wyc/view/home_user/recipe_details.dart';
@@ -167,6 +168,13 @@ List<RouteBase> routes() {
       path: '/${ViewData.scanResult.path}',
       builder: (context, state) {
         return ScanResultPage();
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.aboutActivity.path}',
+      builder: (context, state) {
+        final User user = state.extra as User;
+        return AboutActivityPage(user: user);
       },
     ),
   ];
