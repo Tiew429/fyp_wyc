@@ -11,7 +11,10 @@ import 'package:fyp_wyc/view/auth/forgot.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
 import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:fyp_wyc/view/home_user/recipe_details.dart';
+import 'package:fyp_wyc/view/home_user/scan_result.dart';
+import 'package:fyp_wyc/view/home_user/scanning.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -150,6 +153,20 @@ List<RouteBase> routes() {
         final Recipe recipe = extras['recipe'] as Recipe;
         final User? user = extras['user'] as User?;
         return RecipeDetailsPage(recipe: recipe, user: user);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.scanning.path}',
+      builder: (context, state) {
+        final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+        final XFile image = extras['image'] as XFile;
+        return ScanningPage(image: image);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.scanResult.path}',
+      builder: (context, state) {
+        return ScanResultPage();
       },
     ),
   ];

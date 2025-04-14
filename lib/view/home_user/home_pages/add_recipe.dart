@@ -1,17 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/recipe_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/functions/my_snackbar.dart';
-import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/ingredient.dart';
 import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/utils/my_button.dart';
 import 'package:fyp_wyc/utils/my_text_field.dart';
-import 'package:go_router/go_router.dart';
+import 'package:fyp_wyc/view/no_log_in/no_log_in.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddRecipePage extends StatefulWidget {
@@ -258,54 +256,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return user == null ? _buildNoLogInUserPage(screenSize) : _buildLogInUserPage(screenSize);
-  }
-
-  Widget _buildNoLogInUserPage(Size screenSize) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'You are not logged in',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Log in to access add recipes',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-          SizedBox(height: 30),
-          ElevatedButton(
-            onPressed: () {
-              navigatorKey.currentContext!.push('/${ViewData.auth.path}');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 26, 218, 128),
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            child: Text(
-              'Login / Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 50),
-        ],
-      ),
-    );
+    return user == null ? NoLogInPage() : _buildLogInUserPage(screenSize);
   }
 
   Widget _buildLogInUserPage(Size screenSize) {
