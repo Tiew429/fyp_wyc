@@ -1,18 +1,19 @@
 import 'package:flutter/widgets.dart';
 import 'package:fyp_wyc/data/my_shared_preferences.dart';
 import 'package:fyp_wyc/event/app_event_bus.dart';
+import 'package:fyp_wyc/event/recipe_event.dart';
 import 'package:fyp_wyc/firebase/firebase_services.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/model/user.dart';
 
-class UserEvent {
+class LocalUserEvent {
   final User? user;
   final Image? avatar;
 
-  UserEvent({this.user, this.avatar});
+  LocalUserEvent({this.user, this.avatar});
 }
 
-class UserStore {
+class LocalUserStore {
   static User? _currentUser;
   static Image? _currentUserAvatar;
 
@@ -30,14 +31,14 @@ class UserStore {
     await MySharedPreferences.saveUser(user);
 
     // fire event when user data is changed
-    AppEventBus.instance.fire(UserEvent(user: user));
+    AppEventBus.instance.fire(LocalUserEvent(user: user));
   }
 
   static Future<void> setCurrentUserAvatar(Image avatar) async {
     _currentUserAvatar = avatar;
 
     // fire event when user data is changed
-    AppEventBus.instance.fire(UserEvent(user: _currentUser!, avatar: avatar));
+    AppEventBus.instance.fire(LocalUserEvent(user: _currentUser!, avatar: avatar));
   }
 
   // logout
@@ -71,7 +72,7 @@ class UserStore {
     await firebaseServices.logOut();
 
     // fire event when user data is changed
-    AppEventBus.instance.fire(UserEvent());
+    AppEventBus.instance.fire(LocalUserEvent());
 
     return {
       'success': true,
@@ -128,13 +129,48 @@ class UserStore {
         await MySharedPreferences.saveUser(updatedUser);
 
         // fire event when user data is changed
-        AppEventBus.instance.fire(UserEvent(user: updatedUser));
+        AppEventBus.instance.fire(LocalUserEvent(user: updatedUser));
       }
       return response;
     } catch (e) {
       return {
         'success': false,
         'message': 'Error occured when updating user: $e',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> submitRecipeRating(String recipeID, double rating) async {
+    try {
+      FirebaseServices firebaseServices = FirebaseServices();
+      final response = await firebaseServices.submitRecipeRating(recipeID, rating);
+
+      // update user rating
+      _currentUser = _currentUser?.copyWith(recipeRating: {
+        ..._currentUser!.recipeRating,
+        recipeID: rating,
+      });
+
+      // update user in shared preferences
+      await MySharedPreferences.saveUser(_currentUser!);
+
+      // update current recipe rating
+      final currentRecipeRating = RecipeStore.recipeList.firstWhere((recipe) => recipe.recipeID == recipeID);
+      currentRecipeRating.rating = {
+        ...currentRecipeRating.rating,
+        _currentUser!.email: rating,
+      };
+      RecipeStore.setRecipe(currentRecipeRating);
+
+      // fire event when user data is changed
+      AppEventBus.instance.fire(LocalUserEvent(user: _currentUser!));
+      AppEventBus.instance.fire(RecipeEvent(recipe: currentRecipeRating));
+
+      return response;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when updating user rating: $e',
       };
     }
   }

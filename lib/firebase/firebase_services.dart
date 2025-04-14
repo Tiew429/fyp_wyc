@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_datacheck.dart';
 import 'package:fyp_wyc/firebase/firebase_options.dart';
 import 'package:fyp_wyc/model/recipe.dart';
@@ -88,8 +88,8 @@ class FirebaseServices {
         'avatarUrl': '',
         'savedRecipes': [],
         'addedRecipes': [],
-        'searchHistory': [],
-        'recipeHistory': [],
+        'recipeRating': {},
+        'recipeHistory': {},
         'commentIDs': [],
       });
 
@@ -129,7 +129,7 @@ class FirebaseServices {
         final User user = User.fromJson(userData.data()!);
 
         // set user to user provider
-        await UserStore.setCurrentUser(user);
+        await LocalUserStore.setCurrentUser(user);
       } catch (e) {
         return {
           'success': false,
@@ -251,6 +251,24 @@ class FirebaseServices {
     }
   }
 
+  Future<Map<String, dynamic>> updateRecipeViewCount(String recipeID) async {
+    try {
+      await _recipeCollection.doc(recipeID).update({
+        'viewCount': FieldValue.increment(1),
+      });
+
+      return {
+        'success': true,
+        'message': 'Recipe view count updated successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred when updating recipe view count: $e',
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> saveRecipe(String recipeID) async {
     try {
       // get current user
@@ -265,6 +283,11 @@ class FirebaseServices {
       // update user saved recipes
       await _userCollection.doc(currentUser.email).update({
         'savedRecipes': FieldValue.arrayUnion([recipeID]),
+      });
+
+      // update recipe saved count
+      await _recipeCollection.doc(recipeID).update({
+        'savedCount': FieldValue.increment(1),
       });
 
       return {
@@ -295,6 +318,11 @@ class FirebaseServices {
         'savedRecipes': FieldValue.arrayRemove([recipeID]),
       });
 
+      // update recipe saved count
+      await _recipeCollection.doc(recipeID).update({
+        'savedCount': FieldValue.increment(-1),
+      });
+
       return {
         'success': true,
         'message': 'Recipe unsaved successfully',
@@ -303,6 +331,78 @@ class FirebaseServices {
       return {
         'success': false,
         'message': 'Error occured when unsaving recipe: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> addRecipeToHistory(String recipeID) async {
+    try {
+      // get current user
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null) {
+        return {
+          'success': false,
+          'message': 'User not logged in',
+        };
+      }
+
+      // update user recipe history
+      await _userCollection.doc(currentUser.email).update({
+        'recipeHistory': {
+          recipeID: DateTime.now().toIso8601String(),
+        },
+      });
+
+      // update recipe view count
+      await _recipeCollection.doc(recipeID).update({
+        'viewCount': FieldValue.increment(1),
+      });
+
+      return {
+        'success': true,
+        'message': 'Recipe added to history successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when adding recipe to history: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> submitRecipeRating(String recipeID, double rating) async {
+    try {
+      // get current user
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null) {
+        return {
+          'success': false,
+          'message': 'User not logged in',
+        };
+      }
+
+      // update user rating
+      await _userCollection.doc(currentUser.email).update({
+        'recipeRating': {
+          recipeID: rating,
+        },
+      });
+
+      // update recipe rating
+      await _recipeCollection.doc(recipeID).update({
+        'rating': {
+          currentUser.email: rating,
+        },
+      });
+
+      return {
+        'success': true,
+        'message': 'User rating updated successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when updating user rating: $e',
       };
     }
   }
@@ -334,6 +434,15 @@ class FirebaseServices {
       return userData.exists;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<User?> getUserByEmail(String email) async {
+    try {
+      final userData = await _userCollection.doc(email).get();
+      return User.fromJson(userData.data()!);
+    } catch (e) {
+      return null;
     }
   }
 }

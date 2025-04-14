@@ -1,5 +1,5 @@
 import 'package:fyp_wyc/event/app_event_bus.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_services.dart';
 import 'package:fyp_wyc/model/recipe.dart';
 
@@ -93,7 +93,7 @@ class RecipeStore {
       await firebaseServices.saveRecipe(recipeID);
 
       // update local user saved recipes
-      UserStore.currentUser?.savedRecipes.add(recipeID);
+      LocalUserStore.currentUser?.savedRecipes.add(recipeID);
 
       // fire event when recipe data is changed
       AppEventBus.instance.fire(RecipeEvent(recipeList: _recipeList));
@@ -116,7 +116,7 @@ class RecipeStore {
       await firebaseServices.unsaveRecipe(recipeID);
 
       // update local user saved recipes
-      UserStore.currentUser?.savedRecipes.remove(recipeID);
+      LocalUserStore.currentUser?.savedRecipes.remove(recipeID);
 
       // fire event when recipe data is changed
       AppEventBus.instance.fire(RecipeEvent(recipeList: _recipeList));
@@ -129,6 +129,29 @@ class RecipeStore {
       return {
         'success': false,
         'message': 'Failed to unsave recipe',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> addRecipeToHistory(String recipeID) async {
+    try {
+      FirebaseServices firebaseServices = FirebaseServices();
+      await firebaseServices.addRecipeToHistory(recipeID);
+
+      // update local user recipe history
+      LocalUserStore.currentUser?.recipeHistory[recipeID] = DateTime.now().toIso8601String();
+
+      // fire event when recipe data is changed
+      AppEventBus.instance.fire(RecipeEvent(recipeList: _recipeList));
+
+      return {
+        'success': true,
+        'message': 'Recipe added to history successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Failed to add recipe to history',
       };
     }
   }

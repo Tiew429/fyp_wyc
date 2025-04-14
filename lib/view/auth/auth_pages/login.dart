@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_services.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/utils/my_button.dart';
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> loginAsGuest() async {
     // ensure there has no user data in app event bus, firebase auth and shared preferences
-    final response = await UserStore.clearCurrentUser();
+    final response = await LocalUserStore.clearCurrentUser();
 
     if (response['success']) {
       MySnackBar.showSnackBar('Continue as guest');

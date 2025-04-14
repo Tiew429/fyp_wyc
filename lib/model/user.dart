@@ -12,8 +12,8 @@ class User {
   String avatarUrl; // path to avatar image in firebase storage
   List<String> savedRecipes; // list of saved recipe ids
   List<String> addedRecipes; // list of added recipe ids
-  List<String> searchHistory;
-  List<String> recipeHistory; // list of recipe ids that viewed
+  Map<String, dynamic> recipeRating; // map of recipe id to rating (recipeID -> rating(int))
+  Map<String, dynamic> recipeHistory; // map of recipe id to datetime (recipeID -> datetime(iso8601 string))
   List<String> commentIDs;
 
   User({
@@ -28,8 +28,8 @@ class User {
     this.avatarUrl = '',
     this.savedRecipes = const [],
     this.addedRecipes = const [],
-    this.searchHistory = const [],
-    this.recipeHistory = const [],
+    this.recipeRating = const {},
+    this.recipeHistory = const {},
     this.commentIDs = const [],
   });
 
@@ -46,8 +46,8 @@ class User {
       avatarUrl: json['avatarUrl'],
       savedRecipes: DataTypeConverter.convertToStringList(json['savedRecipes']),
       addedRecipes: DataTypeConverter.convertToStringList(json['addedRecipes']),
-      searchHistory: DataTypeConverter.convertToStringList(json['searchHistory']),
-      recipeHistory: DataTypeConverter.convertToStringList(json['recipeHistory']),
+      recipeRating: json['recipeRating'],
+      recipeHistory: json['recipeHistory'],
       commentIDs: DataTypeConverter.convertToStringList(json['commentIDs']),
     );
   }
@@ -65,7 +65,7 @@ class User {
       'avatarUrl': avatarUrl,
       'savedRecipes': savedRecipes,
       'addedRecipes': addedRecipes,
-      'searchHistory': searchHistory,
+      'recipeRating': recipeRating,
       'recipeHistory': recipeHistory,
       'commentIDs': commentIDs,
     };
@@ -83,8 +83,9 @@ class User {
     String? avatarUrl,
     List<String>? savedRecipes,
     List<String>? addedRecipes,
+    Map<String, dynamic>? recipeRating,
     List<String>? searchHistory,
-    List<String>? recipeHistory,
+    Map<String, dynamic>? recipeHistory,
     List<String>? commentIDs,
   }) {
     return User(
@@ -99,7 +100,7 @@ class User {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       savedRecipes: savedRecipes ?? this.savedRecipes,
       addedRecipes: addedRecipes ?? this.addedRecipes,
-      searchHistory: searchHistory ?? this.searchHistory,
+      recipeRating: recipeRating ?? this.recipeRating,
       recipeHistory: recipeHistory ?? this.recipeHistory,
       commentIDs: commentIDs ?? this.commentIDs,
     );

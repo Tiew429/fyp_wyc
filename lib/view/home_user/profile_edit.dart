@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/functions/my_snackbar.dart';
 import 'package:fyp_wyc/main.dart';
@@ -69,7 +69,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     String newName = _displayNameController.text;
     String newAboutMe = _aboutMeController.text;
 
-    final response = await UserStore.updateUser(email, _imageFile?.path, newName, newAboutMe, _gender);
+    final response = await LocalUserStore.updateUser(email, _imageFile?.path, newName, newAboutMe, _gender);
 
     if (response['success']) {
       setState(() {
@@ -90,27 +90,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Edit Profile'),
-        actions: [
-          TextButton(
-            onPressed: isSaveEnabled ? () => _saveUser() : null,
-            child: Text('Save',
-              style: TextStyle(
-                color: isSaveEnabled ? Color(0xFF00BFA6) : Colors.grey[700],
-              ),
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1.0),
-          child: Container(
-            color: Colors.grey[300],
-            height: 1.0,
-          ),
-        ),
-      ),
+      appBar: _buildAppBar() as AppBar,
       body: SafeArea(
         child: Stack(
           children: [
@@ -142,12 +122,36 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
+  Widget _buildAppBar() {
+    return AppBar(
+      centerTitle: true,
+      title: Text('Edit Profile'),
+      actions: [
+        TextButton(
+          onPressed: isSaveEnabled ? () => _saveUser() : null,
+          child: Text('Save',
+            style: TextStyle(
+              color: isSaveEnabled ? Color(0xFF00BFA6) : Colors.grey[700],
+            ),
+          ),
+        ),
+      ],
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(1.0),
+        child: Container(
+          color: Colors.grey[300],
+          height: 1.0,
+        ),
+      ),
+    );
+  }
+
   Widget _buildAvatarWithCameraSection(Size screenSize) {
     return Stack(
       children: [
         MyAvatar(
           radius: screenSize.width * 0.13,
-          image: _imageFile != null ? Image.file(File(_imageFile!.path)) : UserStore.currentUserAvatar,
+          image: _imageFile != null ? Image.file(File(_imageFile!.path)) : LocalUserStore.currentUserAvatar,
         ),
         Positioned(
           bottom: 0,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/my_shared_preferences.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/recipe_event.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_services.dart';
 import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
@@ -40,7 +40,7 @@ class _MainAppState extends State<MainApp> {
         setState(() {
           user = userSharedPreferences;
           initialLocation = '/${ViewData.dashboard.path}';
-          UserStore.setCurrentUser(userSharedPreferences);
+          LocalUserStore.setCurrentUser(userSharedPreferences);
         });
       }
     });
@@ -73,7 +73,7 @@ List<RouteBase> routes() {
     GoRoute(
       path: '/${ViewData.profileEdit.path}',
       builder: (context, state) {
-        User? currentUser = UserStore.currentUser;
+        User? currentUser = LocalUserStore.currentUser;
         // there is no way to navigate to this page if there is no user, so use ! to bypass the null check
         return ProfileEditPage(user: currentUser!);
       },
@@ -82,7 +82,7 @@ List<RouteBase> routes() {
       path: '/${ViewData.dashboard.path}',
       builder: (context, state) {
         // get current user at the time of navigation
-        User? currentUser = UserStore.currentUser;
+        User? currentUser = LocalUserStore.currentUser;
 
         // if not available in UserStore, try to get from SharedPreferences
         if (currentUser == null) {
@@ -90,7 +90,7 @@ List<RouteBase> routes() {
           final userFromPrefs = MySharedPreferences.getUser().then((user) {
             if (user != null) {
               // update the UserStore with the user from SharedPreferences
-              UserStore.setCurrentUser(user);
+              LocalUserStore.setCurrentUser(user);
             }
             return user;
           });

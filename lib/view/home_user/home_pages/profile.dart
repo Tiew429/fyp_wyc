@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/user.dart';
@@ -31,12 +31,12 @@ class _ProfilePageState extends State<ProfilePage> {
     user = widget.user;
     
     if (user != null) {
-      userAvatar = UserStore.currentUserAvatar;
+      userAvatar = LocalUserStore.currentUserAvatar;
       
       // if avatar is not in UserStore but URL exists, load it from network
       if (userAvatar == null && user!.avatarUrl.isNotEmpty) {
         userAvatar = ImageFunctions.getAvatarInFuture(user!.avatarUrl);
-        UserStore.setCurrentUserAvatar(userAvatar!);
+        LocalUserStore.setCurrentUserAvatar(userAvatar!);
       }
     }
   }
@@ -44,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _logOut() async {
     try {
       // clear current user data in app event bus, firebase auth and shared preferences
-      final response = await UserStore.logoutUser();
+      final response = await LocalUserStore.logoutUser();
   
       // logout
       if (response['success']) {

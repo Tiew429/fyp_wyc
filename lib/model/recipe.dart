@@ -1,3 +1,4 @@
+import 'package:fyp_wyc/functions/data_type_converter.dart';
 import 'package:fyp_wyc/model/ingredient.dart';
 
 class Recipe {
@@ -11,7 +12,7 @@ class Recipe {
   String authorEmail;
   int timeToCookInMinute; // time to cook in minutes
   double difficulty;
-  double rating;
+  Map<String, double> rating; // store user email and rating
   int viewCount;
   int savedCount;
   List<String> commentIDs;
@@ -27,7 +28,7 @@ class Recipe {
     required this.authorEmail,
     this.timeToCookInMinute = 0,
     this.difficulty = 0,
-    this.rating = 0,
+    this.rating = const {},
     this.viewCount = 0,
     this.savedCount = 0,
     this.commentIDs = const [],
@@ -99,7 +100,7 @@ class Recipe {
         authorEmail: json['authorID'] ?? '',
         timeToCookInMinute: json['timeToCookInMinute'] is int ? json['timeToCookInMinute'] : 0,
         difficulty: json['difficulty'] is double ? json['difficulty'] : json['difficulty'] is int ? json['difficulty'].toDouble() : 0.0,
-        rating: json['rating'] is double ? json['rating'] : json['rating'] is int ? json['rating'].toDouble() : 0.0,
+        rating: DataTypeConverter.parseRatingMap(json['rating']),
         viewCount: json['viewCount'] is int ? json['viewCount'] : 0,
         savedCount: json['savedCount'] is int ? json['savedCount'] : 0,
         commentIDs: parsedCommentIDs,

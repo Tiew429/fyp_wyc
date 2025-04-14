@@ -60,7 +60,9 @@ class MyTextField extends StatelessWidget {
         ) : null,
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25),
-          borderSide: borderDisplay ? BorderSide(color: Colors.grey[700]!) : BorderSide.none,
+          borderSide: borderDisplay 
+              ? BorderSide(color: const Color.fromARGB(255, 26, 218, 128)) 
+              : BorderSide.none,
         ),
         hintStyle: TextStyle(color: Colors.grey[400]),
         labelStyle: TextStyle(color: Colors.grey[800]),

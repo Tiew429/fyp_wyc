@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/recipe_event.dart';
-import 'package:fyp_wyc/event/user_event.dart';
+import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
@@ -31,15 +31,104 @@ class _HomePageState extends State<HomePage> {
   User? user;
   late Image? userAvatar;
   final TextEditingController _searchController = TextEditingController();
-  late List<Recipe> recipeList;
+  late List<Recipe> recipeList, filteredRecipeList;
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
-    userAvatar = UserStore.currentUserAvatar;
+    userAvatar = LocalUserStore.currentUserAvatar;
     recipeList = widget.recipeList ?? [];
+    filteredRecipeList = recipeList;
+  }
+
+  void _onSearchChanged() {
+    final String query = _searchController.text.trim().toLowerCase();
+    
+    if (query.isEmpty) {
+      setState(() {
+        filteredRecipeList = recipeList;
+      });
+      return;
+    }
+
+    final List<Recipe> results = recipeList.where((recipe) {
+      // check recipe name
+      if (recipe.recipeName.toLowerCase().contains(query)) {
+        return true;
+      }
+      
+      // check description
+      if (recipe.description.toLowerCase().contains(query)) {
+        return true;
+      }
+      
+      // check time to cook with operators (>, <, =, >=, <=)
+      if (_matchesCookingTime(recipe, query)) {
+        return true;
+      }
+      
+      // check ingredients
+      for (var ingredient in recipe.ingredients) {
+        if (ingredient.ingredientName.toLowerCase().contains(query)) {
+          return true;
+        }
+      }
+      
+      // check tags
+      for (var tag in recipe.tags) {
+        if (tag.name.toLowerCase().contains(query)) {
+          return true;
+        }
+      }
+      
+      return false;
+    }).toList();
+    
+    setState(() {
+      filteredRecipeList = results;
+    });
+  }
+  
+  bool _matchesCookingTime(Recipe recipe, String query) {
+    // Check for time comparison queries
+    final RegExp timeRegex = RegExp(r'^([<>=]{1,2})\s*(\d+)$');
+    final match = timeRegex.firstMatch(query);
+    
+    if (match != null) {
+      final String operator = match.group(1)!;
+      final int value = int.parse(match.group(2)!);
+      final int cookTime = recipe.timeToCookInMinute;
+      
+      switch (operator) {
+        case '>':
+          return cookTime > value;
+        case '<':
+          return cookTime < value;
+        case '=':
+          return cookTime == value;
+        case '>=':
+          return cookTime >= value;
+        case '<=':
+          return cookTime <= value;
+        default:
+          return false;
+      }
+    }
+    
+    // Check for direct cooking time mentions
+    if (query.contains('min') || query.contains('minute')) {
+      final RegExp minuteRegex = RegExp(r'(\d+)');
+      final minuteMatch = minuteRegex.firstMatch(query);
+      
+      if (minuteMatch != null) {
+        final int value = int.parse(minuteMatch.group(1)!);
+        return recipe.timeToCookInMinute == value;
+      }
+    }
+    
+    return false;
   }
 
   Future<void> _refreshRecipeList() async {
@@ -68,9 +157,12 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  void _onRecipeTap(Recipe recipe) {
+  Future<void> _onRecipeTap(Recipe recipe) async {
     // select recipe
     RecipeStore.setRecipe(recipe);
+
+    // add to recipe history
+    await RecipeStore.addRecipeToHistory(recipe.recipeID);
 
     // navigate to recipe details page
     navigatorKey.currentContext!.push(
@@ -106,6 +198,7 @@ class _HomePageState extends State<HomePage> {
                 controller: _searchController,
                 hintText: 'Search...',
                 onChanged: (value) {
+                  _onSearchChanged();
                   setState(() {});
                 },
                 isClearable: _searchController.text.isNotEmpty,
@@ -122,7 +215,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildRecipeGrid() {
     return Expanded(
-      child: recipeList.isEmpty ? 
+      child: filteredRecipeList.isEmpty ? 
         MyEmptyWidgets(
           text: 'No recipes found',
           onPressed: () async => await _refreshRecipeList(),
@@ -139,15 +232,15 @@ class _HomePageState extends State<HomePage> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
             ),
-            itemCount: recipeList.length,
+            itemCount: filteredRecipeList.length,
             itemBuilder: (context, index) {
               return MyRecipeBox(
-                imageUrl: recipeList[index].imageUrl,
-                title: recipeList[index].recipeName,
-                cookTime: recipeList[index].timeToCookInMinute,
-                isSaved: user?.savedRecipes.contains(recipeList[index].recipeID) ?? false,
-                onSave: () async => await _onSaveTap(recipeList[index].recipeID),
-                onTap: () => _onRecipeTap(recipeList[index]),
+                imageUrl: filteredRecipeList[index].imageUrl,
+                title: filteredRecipeList[index].recipeName,
+                cookTime: filteredRecipeList[index].timeToCookInMinute,
+                isSaved: user?.savedRecipes.contains(filteredRecipeList[index].recipeID) ?? false,
+                onSave: () async => await _onSaveTap(filteredRecipeList[index].recipeID),
+                onTap: () => _onRecipeTap(filteredRecipeList[index]),
                 showSaveButton: user != null,
               );
             },
