@@ -5,7 +5,7 @@ class MyRecipeBox extends StatelessWidget {
   final String title;
   final int cookTime;
   final bool isSaved;
-  final VoidCallback onSave;
+  final VoidCallback? onSave;
   final VoidCallback onTap;
   final bool showSaveButton;
 
@@ -15,7 +15,7 @@ class MyRecipeBox extends StatelessWidget {
     required this.title,
     required this.cookTime,
     this.isSaved = false,
-    required this.onSave,
+    this.onSave,
     required this.onTap,
     this.showSaveButton = true,
   });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/local_user_event.dart';
+import 'package:fyp_wyc/event/recipe_event.dart';
 import 'package:fyp_wyc/functions/image_functions.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/recipe.dart';
@@ -29,6 +30,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late Image? userAvatar;
   List<Recipe>? recipes;
   List<Recipe>? userAddedRecipes;
+  bool isRefreshing = false;
 
   @override
   void initState() {
@@ -49,6 +51,33 @@ class _ProfilePageState extends State<ProfilePage> {
         LocalUserStore.setCurrentUserAvatar(userAvatar!);
       }
     }
+  }
+
+  Future<void> _refreshRecipeIdeas() async {
+    setState(() {
+      isRefreshing = true;
+    });
+    await RecipeStore.getRecipeList();
+    setState(() {
+      isRefreshing = false;
+    });
+  }
+
+  Future<void> _onRecipeTap(Recipe recipe) async {
+    // select recipe
+    RecipeStore.setRecipe(recipe);
+
+    // add to recipe history
+    await RecipeStore.addRecipeToHistory(recipe.recipeID);
+
+    // navigate to recipe details page
+    navigatorKey.currentContext!.push(
+      '/${ViewData.recipeDetails.path}',
+      extra: {
+        'recipe': recipe,
+        'user': user,
+      },
+    );
   }
 
   @override
@@ -133,18 +162,45 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         SizedBox(height: 16.0),
-        _buildRecipeIdeasList(),
+        _buildRecipeIdeasGrid(),
       ],
     );
   }
 
-  Widget _buildRecipeIdeasList() {
+  Widget _buildRecipeIdeasGrid() {
     if (userAddedRecipes == null || userAddedRecipes!.isEmpty) {
       return Center(
         child: Text('No recipe ideas yet'),
       );
     }
     
-    return Container();
+    return RefreshIndicator(
+      onRefresh: () async => await _refreshRecipeIdeas(),
+      color: Color(0xFF00BFA6),
+      child: SizedBox(
+        height: 300,
+        child: GridView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.75,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: userAddedRecipes!.length > 4 ? 4 : userAddedRecipes!.length, // Limit to 4 items
+          itemBuilder: (context, index) {
+            return MyRecipeBox(
+              imageUrl: userAddedRecipes![index].imageUrl,
+              title: userAddedRecipes![index].recipeName,
+              cookTime: userAddedRecipes![index].timeToCookInMinute,
+              isSaved: false,
+              showSaveButton: false,
+              onTap: () async => await _onRecipeTap(userAddedRecipes![index]),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

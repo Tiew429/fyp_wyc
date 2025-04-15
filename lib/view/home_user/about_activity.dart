@@ -74,10 +74,10 @@ class _AboutActivityPageState extends State<AboutActivityPage> {
   }
 
   Widget _buildActivityItem(String text, VoidCallback onPressed, Color? color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: GestureDetector(
-        onTap: onPressed,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Container(
           decoration: BoxDecoration(),
           child: Row(
@@ -158,11 +158,11 @@ class _AboutActivityPageState extends State<AboutActivityPage> {
 
   Widget _buildLogOutDialogButton(String text, VoidCallback onPressed) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-      ),
+      decoration: BoxDecoration(),
       child: TextButton(
         onPressed: onPressed,
+        onHover: (value) {},
+        onLongPress: () {},
         child: Text(text),
       ),
     );

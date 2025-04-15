@@ -39,7 +39,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    _selectedIndex = 0;
+    _selectedIndex = 2;
     user = widget.user;
     recipeList = widget.recipeList;
 
