@@ -91,25 +91,28 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Widget _buildSelectionButton(String text, VoidCallback onPressed, IconData icon) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 173, 216, 230),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Icon(icon, size: 32),
-            SizedBox(width: 10),
-            Text(text,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 173, 216, 230),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(icon, size: 32),
+              SizedBox(width: 10),
+              Text(text,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

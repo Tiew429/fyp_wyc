@@ -167,7 +167,12 @@ List<RouteBase> routes() {
     GoRoute(
       path: '/${ViewData.scanResult.path}',
       builder: (context, state) {
-        return ScanResultPage();
+        final List<String> selectedIngredients = state.extra as List<String>;
+        return ScanResultPage(
+          user: LocalUserStore.currentUser,
+          selectedIngredients: selectedIngredients,
+          recipes: RecipeStore.recipeList,
+        );
       },
     ),
     GoRoute(
