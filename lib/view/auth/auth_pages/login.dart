@@ -30,11 +30,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    // for testing purpose, remove after complete
-    _emailOrPhoneController.text = 'wongyc-wp21@student.tarc.edu.my';
-    _passwordController.text = 'admin1111';
-    // _emailOrPhoneController.text = 'tiewjiajun0429@gmail.com';
-    // _passwordController.text = 'aaaaaa1';
   }
 
   @override
@@ -123,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // login form (email or phone number and password)
+        // login form (email and password)
         _buildLoginForm(),
         SizedBox(height: 20),
         // forgot password
@@ -186,7 +181,8 @@ class _LoginPageState extends State<LoginPage> {
           MyTextField(
             controller: _emailOrPhoneController,
             icon: Icon(Icons.email),
-            hintText: 'Email or phone number',
+            hintText: 'Email',
+            keyboardType: TextInputType.emailAddress,
           ),
           SizedBox(height: 15),
           // password text field
