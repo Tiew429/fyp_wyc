@@ -97,6 +97,7 @@ class _HistoryPageState extends State<HistoryPage> {
       extra: {
         'recipe': recipe,
         'user': user,
+        'isAdmin': false,
       },
     );
   }
@@ -159,7 +160,7 @@ class _HistoryPageState extends State<HistoryPage> {
       DateTime viewTime = DateTime.parse(user.recipeHistory[recipe.recipeID]!).add(Duration(hours: 8));
       viewTimeStr = "${viewTime.hour.toString().padLeft(2, '0')}:${viewTime.minute.toString().padLeft(2, '0')}";
     } catch (e) {
-      // Use empty string if time parsing fails
+      print(e);
     }
 
     return GestureDetector(

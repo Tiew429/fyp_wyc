@@ -83,9 +83,12 @@ class _SavedPageState extends State<SavedPage> with SingleTickerProviderStateMix
     setState(() {});
   }
 
-  void _onRecipeTap(Recipe recipe) {
+  Future<void> _onRecipeTap(Recipe recipe) async {
     // select recipe
     RecipeStore.setRecipe(recipe);
+
+    // add to recipe history
+    await RecipeStore.addRecipeToHistory(recipe.recipeID);
     
     // navigate to recipe details page
     navigatorKey.currentContext!.push(
@@ -93,6 +96,7 @@ class _SavedPageState extends State<SavedPage> with SingleTickerProviderStateMix
       extra: {
         'recipe': recipe,
         'user': user,
+        'isAdmin': false,
       },
     );
   }

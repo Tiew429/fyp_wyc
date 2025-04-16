@@ -25,7 +25,7 @@ class User {
     required this.createdAt,
     this.role = 'user',
     this.aboutMe = '',
-    this.gender = 'Not to say',
+    this.gender = 'Prefer not to say',
     this.ageRange = '',
     this.avatarUrl = '',
     this.savedRecipes = const [],

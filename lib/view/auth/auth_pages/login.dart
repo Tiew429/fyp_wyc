@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_services.dart';
 import 'package:fyp_wyc/main.dart';
@@ -73,8 +72,7 @@ class _LoginPageState extends State<LoginPage> {
       // email
       response = await firebaseServices.signInWithEmail(emailOrPhone, password);
     } else {
-      // phone number
-      // still thinking
+      MySnackBar.showSnackBar('Please enter email only');
     }
 
     setState(() {
@@ -97,8 +95,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
   }
-
-  Future<void> loginWithGoogle() async {}
 
   Future<void> loginAsGuest() async {
     // ensure there has no user data in app event bus, firebase auth and shared preferences
@@ -218,18 +214,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildExtraButtons() {
     return Column(
       children: [
-        // google button
-        MyButton(
-          onPressed: () async => await loginWithGoogle(),
-          text: 'Google',
-          backgroundColor: const Color.fromARGB(255, 244, 81, 63),
-          icon: Icon(FontAwesomeIcons.google,
-            color: Colors.white,
-          ),
-          isLoading: isGoogleLoading,
-          isEnabled: !_isLoading(),
-        ),
-        SizedBox(height: 15),
         // continue as guest
         MyButton(
           onPressed: () async => await loginAsGuest(),

@@ -16,11 +16,13 @@ import 'package:go_router/go_router.dart';
 class RecipeDetailsPage extends StatefulWidget {
   final Recipe recipe;
   final User? user;
+  final bool? isAdmin;
 
   const RecipeDetailsPage({
     super.key,
     required this.recipe,
     this.user,
+    this.isAdmin = false,
   });
 
   @override
@@ -37,10 +39,13 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   User? creator;
   bool isCreator = false;
   double averageRating = 0.0;
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    isAdmin = widget.isAdmin ?? false;
+
     recipe = widget.recipe;
     user = widget.user;
     isSaved = user?.savedRecipes.contains(recipe.recipeID) ?? false;
@@ -114,8 +119,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
           image!,
           _buildRecipeBottomSheet(screenSize),
           _buildExitButton(),
-          _buildSaveButton(),
-          if (isCreator) _buildEditButton(),
+          if (!isAdmin) _buildSaveButton(),
+          if (isCreator || isAdmin) _buildEditButton(),
         ],
       ),
     );
@@ -154,7 +159,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
 
   Widget _buildEditButton() {
     return Positioned(
-      top: 80,
+      top: isAdmin ? 20 : 80,
       right: 0,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -620,9 +625,9 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   }
 
   Widget _buildRatingSection(Map<String, double> rating) {
-    double? originalUserRating = rating[user!.email] ?? 0.0;
-    double userRating = originalUserRating;
-    bool isRated = (originalUserRating != 0.0);
+    double? originalUserRating = user != null ? rating[user!.email] : 0.0;
+    double userRating = originalUserRating ?? 0.0;
+    bool isRated = user != null || (originalUserRating != 0.0);
     bool isRating = (userRating != 0.0);
     bool isLoading = false;
 
@@ -681,6 +686,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
               final newRating = (index + 1).toDouble();
               if (user != null) {
                 recipe.rating[user!.email] = newRating;
+              } else {
+                MySnackBar.showSnackBar("Please login to rate this recipe");
               }
             });
           }

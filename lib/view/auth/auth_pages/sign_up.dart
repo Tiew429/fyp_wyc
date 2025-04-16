@@ -45,7 +45,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // sign up in firebase authentication and firestore
     FirebaseServices firebaseServices = FirebaseServices();
-    Map<String, dynamic> response = await firebaseServices.signUp(email, phone, username, password);
+    Map<String, dynamic> response = await firebaseServices.signUpByEmail(email, phone, username, password);
 
     bool isSuccess = response['success'];
     String message = response['message'];

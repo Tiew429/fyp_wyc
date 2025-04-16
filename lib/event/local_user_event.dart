@@ -85,6 +85,7 @@ class LocalUserStore {
     String email,
     String? imagePath,
     String newName,
+    String newPhone,
     String newAboutMe,
     String newGender,
   ) async {
@@ -108,6 +109,7 @@ class LocalUserStore {
       // update user
       final updatedUser = _currentUser?.copyWith(
         username: newName,
+        phone: newPhone,
         aboutMe: newAboutMe,
         gender: newGender,
         avatarUrl: imageUrl != '' ? imageUrl : _currentUser?.avatarUrl,

@@ -25,6 +25,7 @@ class AdminPage extends StatefulWidget {
 
 class _AdminPageState extends State<AdminPage> {
   late int _selectedIndex;
+  late List<String> _appBarTitles;
   late List<Widget> _pages;
   List<Recipe>? recipeList = [];
   List<User>? userList = [];
@@ -40,6 +41,12 @@ class _AdminPageState extends State<AdminPage> {
       RecipeLibraryPage(recipeList: recipeList),
       UserListPage(userList: userList),
       ReportPage(userList: userList),
+    ];
+
+    _appBarTitles = [
+      'Recipe Library',
+      'User List',
+      'Report',
     ];
   }
 
@@ -59,6 +66,7 @@ class _AdminPageState extends State<AdminPage> {
             );
           },
         ),
+        title: Text(_appBarTitles[_selectedIndex]),
       ),
       drawer: Drawer(
         child: ListView(

@@ -49,7 +49,7 @@ class FirebaseServices {
     await _firebaseAuth.signOut();
   }
 
-  Future<Map<String, dynamic>> signUp(String email, String phone, String username, String password) async {
+  Future<Map<String, dynamic>> signUpByEmail(String email, String phone, String username, String password) async {
     try {
       // check if email and phone exists in firestore
       bool emailExists = await _firebaseDataCheck.checkEmailExists(email);
@@ -90,27 +90,8 @@ class FirebaseServices {
         };
       }
 
-      // user creation in firebase firestore
-      String uid = userCredential!.user!.uid;
-      String createdAt = DateTime.now().toIso8601String();
-
-      await _userCollection.doc(email).set({
-        'email': email,
-        'username': username,
-        'uid': uid,
-        'phone': phone,
-        'createdAt': createdAt,
-        'role': 'user',
-        'aboutMe': '',
-        'gender': '',
-        'ageRange': '',
-        'avatarUrl': '',
-        'savedRecipes': [],
-        'addedRecipes': [],
-        'recipeRating': {},
-        'recipeHistory': {},
-        'firstTimeLogin': true,
-      });
+      // create user in firestore
+      await createUser(email, username, phone);
 
       return {
         'success': true,
@@ -172,8 +153,6 @@ class FirebaseServices {
       };
     }
   }
-
-  // Future<Map<String, dynamic>> signInWithPhone(String phone, String password) async {}
 
   Future<Map<String, dynamic>> logOut() async {
     try {
@@ -512,6 +491,35 @@ class FirebaseServices {
   CollectionReference<Map<String, dynamic>> get _adminCollection => _firebaseFirestore.collection('admin');
   CollectionReference<Map<String, dynamic>> get _userCollection => _firebaseFirestore.collection('users');
   CollectionReference<Map<String, dynamic>> get _recipeCollection => _firebaseFirestore.collection('recipes');
+
+  Future<Map<String, dynamic>> createUser(String email, String? username, String? phone) async {
+    // user creation in firebase firestore
+    String uid = userCredential!.user!.uid;
+    String createdAt = DateTime.now().toIso8601String();
+
+    await _userCollection.doc(email).set({
+      'email': email,
+      'username': username ?? email,
+      'uid': uid,
+      'phone': phone ?? '',
+      'createdAt': createdAt,
+      'role': 'user',
+      'aboutMe': '',
+      'gender': 'Prefer not to say',
+      'ageRange': '',
+      'avatarUrl': '',
+      'savedRecipes': [],
+      'addedRecipes': [],
+      'recipeRating': {},
+      'recipeHistory': {},
+      'firstTimeLogin': true,
+    });
+
+    return {
+      'success': true,
+      'message': 'User created successfully',
+    };
+  }
 
   Future<String> uploadAvatar(String email, String imagePath) async {
     try {

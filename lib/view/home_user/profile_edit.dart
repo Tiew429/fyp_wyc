@@ -29,6 +29,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _imageFile;
   final _displayNameController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _aboutMeController = TextEditingController();
   late String _gender;
   bool isLoading = false;
@@ -38,6 +39,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     super.initState();
     currentUser = widget.user;
     _displayNameController.text = currentUser.username;
+    _phoneController.text = currentUser.phone;
     _aboutMeController.text = currentUser.aboutMe;
     _gender = currentUser.gender;
   }
@@ -45,6 +47,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   void _onChangeSaveable() {
     isSaveEnabled = _imageFile != null || 
       currentUser.username != _displayNameController.text || 
+      currentUser.phone != _phoneController.text ||
       currentUser.aboutMe != _aboutMeController.text || 
       currentUser.gender != _gender;
   }
@@ -67,13 +70,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     String email = currentUser.email;
     String newName = _displayNameController.text;
+    String newPhone = _phoneController.text;
     String newAboutMe = _aboutMeController.text;
 
-    final response = await LocalUserStore.updateUser(email, _imageFile?.path, newName, newAboutMe, _gender);
+    final response = await LocalUserStore.updateUser(email, _imageFile?.path, newName, newPhone, newAboutMe, _gender);
 
     if (response['success']) {
       setState(() {
         currentUser.username = newName;
+        currentUser.phone = newPhone;
         currentUser.aboutMe = newAboutMe;
         currentUser.gender = _gender;
         isLoading = false;
@@ -103,6 +108,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     children: [
                       _buildAvatarWithCameraSection(screenSize),
                       _buildDisplayNameSection(screenSize),
+                      _buildPhoneSection(screenSize),
                       _buildAboutMeSection(screenSize),
                       _buildGenderSection(screenSize),
                     ],
@@ -192,6 +198,30 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             },
             decoration: InputDecoration(
               hintText: 'Enter your display name',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneSection(Size screenSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionName('Phone Number'),
+        SizedBox(
+          width: screenSize.width * 0.8,
+          child: TextField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            onChanged: (String value) {
+              setState(() {
+                _onChangeSaveable();
+              });
+            },
+            decoration: InputDecoration(
+              hintText: 'Enter your phone number',
             ),
           ),
         ),

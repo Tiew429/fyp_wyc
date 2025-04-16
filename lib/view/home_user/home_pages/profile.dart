@@ -76,6 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
       extra: {
         'recipe': recipe,
         'user': user,
+        'isAdmin': false,
       },
     );
   }

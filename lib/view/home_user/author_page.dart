@@ -85,6 +85,7 @@ class _AuthorPageState extends State<AuthorPage> with SingleTickerProviderStateM
       extra: {
         'recipe': recipe,
         'user': user,
+        'isAdmin': false,
       },
     );
   }
