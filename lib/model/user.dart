@@ -14,7 +14,7 @@ class User {
   List<String> addedRecipes; // list of added recipe ids
   Map<String, dynamic> recipeRating; // map of recipe id to rating (recipeID -> rating(int))
   Map<String, dynamic> recipeHistory; // map of recipe id to datetime (recipeID -> datetime(iso8601 string))
-  List<String> commentIDs;
+  bool firstTimeLogin;
 
   User({
     required this.email,
@@ -30,7 +30,7 @@ class User {
     this.addedRecipes = const [],
     this.recipeRating = const {},
     this.recipeHistory = const {},
-    this.commentIDs = const [],
+    this.firstTimeLogin = true,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -48,7 +48,7 @@ class User {
       addedRecipes: DataTypeConverter.convertToStringList(json['addedRecipes']),
       recipeRating: json['recipeRating'],
       recipeHistory: json['recipeHistory'],
-      commentIDs: DataTypeConverter.convertToStringList(json['commentIDs']),
+      firstTimeLogin: json['firstTimeLogin'],
     );
   }
 
@@ -67,7 +67,7 @@ class User {
       'addedRecipes': addedRecipes,
       'recipeRating': recipeRating,
       'recipeHistory': recipeHistory,
-      'commentIDs': commentIDs,
+      'firstTimeLogin': firstTimeLogin,
     };
   }
 
@@ -86,7 +86,7 @@ class User {
     Map<String, dynamic>? recipeRating,
     List<String>? searchHistory,
     Map<String, dynamic>? recipeHistory,
-    List<String>? commentIDs,
+    bool? firstTimeLogin,
   }) {
     return User(
       email: email ?? this.email,
@@ -102,7 +102,7 @@ class User {
       addedRecipes: addedRecipes ?? this.addedRecipes,
       recipeRating: recipeRating ?? this.recipeRating,
       recipeHistory: recipeHistory ?? this.recipeHistory,
-      commentIDs: commentIDs ?? this.commentIDs,
+      firstTimeLogin: firstTimeLogin ?? this.firstTimeLogin,
     );
   }
 }

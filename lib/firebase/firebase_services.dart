@@ -90,7 +90,7 @@ class FirebaseServices {
         'addedRecipes': [],
         'recipeRating': {},
         'recipeHistory': {},
-        'commentIDs': [],
+        'firstTimeLogin': true,
       });
 
       return {
@@ -107,12 +107,13 @@ class FirebaseServices {
 
   Future<Map<String, dynamic>> signInWithEmail(String email, String password) async {
     try {
+      Map<String, dynamic> result = {};
       try {
         // check if email exists in firestore
         bool emailExists = await _firebaseDataCheck.checkEmailExists(email);
 
         if (!emailExists) {
-          return {
+          result = {
             'success': false,
             'message': 'The email address is not found',
           };
@@ -130,6 +131,12 @@ class FirebaseServices {
 
         // set user to user provider
         await LocalUserStore.setCurrentUser(user);
+
+        result = {
+          'success': true,
+          'message': 'Logged in successfully',
+          'firstTimeLogin': user.firstTimeLogin,
+        };
       } catch (e) {
         return {
           'success': false,
@@ -137,10 +144,7 @@ class FirebaseServices {
         };
       }
 
-      return {
-        'success': true,
-        'message': 'Logged in successfully',
-      };
+      return result;
     } catch (e) {
       return {
         'success': false,
@@ -163,6 +167,21 @@ class FirebaseServices {
       return {
         'success': false,
         'message': 'Error occured when logging out: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> sendResetLink(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return {
+        'success': true,
+        'message': 'Reset link sent successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when sending reset link: $e',
       };
     }
   }
@@ -428,7 +447,6 @@ class FirebaseServices {
         ingredients: recipe.ingredients,
         tags: recipe.tags,
         rating: recipe.rating,
-        commentIDs: recipe.commentIDs,
         viewCount: recipe.viewCount,
         savedCount: recipe.savedCount,
       );

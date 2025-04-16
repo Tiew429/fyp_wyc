@@ -15,7 +15,6 @@ class Recipe {
   Map<String, double> rating; // store user email and rating
   int viewCount;
   int savedCount;
-  List<String> commentIDs;
 
   Recipe({
     required this.recipeID,
@@ -31,7 +30,6 @@ class Recipe {
     this.rating = const {},
     this.viewCount = 0,
     this.savedCount = 0,
-    this.commentIDs = const [],
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -103,7 +101,6 @@ class Recipe {
         rating: DataTypeConverter.parseRatingMap(json['rating']),
         viewCount: json['viewCount'] is int ? json['viewCount'] : 0,
         savedCount: json['savedCount'] is int ? json['savedCount'] : 0,
-        commentIDs: parsedCommentIDs,
       );
     } catch (e) {
       return Recipe(
@@ -130,7 +127,6 @@ class Recipe {
       'rating': rating,
       'viewCount': viewCount,
       'savedCount': savedCount,
-      'commentIDs': commentIDs,
     };
   }
 }

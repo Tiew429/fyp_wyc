@@ -119,7 +119,6 @@ class _RecipeEditPageState extends State<RecipeEditPage> {
         ingredients: _ingredients,
         tags: _tags,
         rating: recipe.rating,
-        commentIDs: recipe.commentIDs,
         viewCount: recipe.viewCount,
         savedCount: recipe.savedCount,
       );

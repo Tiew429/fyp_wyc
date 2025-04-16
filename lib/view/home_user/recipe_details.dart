@@ -95,6 +95,17 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
     );
   }
 
+  Future<void> _onAuthorTap() async {
+    // get the author first
+    final User? author = await OnlineUserStore.getAuthor(recipe.authorEmail);
+    if (author != null) {
+      navigatorKey.currentContext!.push(
+        '/${ViewData.author.path}',
+        extra: {'author': author},
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -326,11 +337,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
                         child: Divider(),
                       ),
                       _buildRatingSection(recipe.rating),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Divider(),
-                      ),
-                      _buildCommentSection(),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -571,43 +578,46 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   }
 
   Widget _buildAuthorSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Creator",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () async => await _onAuthorTap(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Creator",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        SizedBox(height: 10),
-        Row(
-          children: [
-            MyAvatar(
-              image: OnlineUserStore.currentUserAvatar,
-              radius: 35,
-            ),
-            SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(creator?.username ?? "Unknown",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+          SizedBox(height: 10),
+          Row(
+            children: [
+              MyAvatar(
+                image: OnlineUserStore.currentUserAvatar,
+                radius: 35,
+              ),
+              SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(creator?.username ?? "Unknown",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(creator?.aboutMe ?? "No description",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey.shade700,
+                  Text(creator?.aboutMe ?? "No description",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade700,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -682,26 +692,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
           color: index < currentRating ? Colors.amber : Colors.grey.shade300,
         ),
       )),
-    );
-  }
-
-  Widget _buildCommentSection() {
-    return Column(
-      children: [
-        Text("Comments",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 5),
-        Text("${recipe.commentIDs.length} comments",
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.grey.shade700,
-          ),
-        ),
-      ],
     );
   }
 }

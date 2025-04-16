@@ -9,7 +9,10 @@ import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
 import 'package:fyp_wyc/view/home_user/about_activity.dart';
+import 'package:fyp_wyc/view/home_user/author_page.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
+import 'package:fyp_wyc/view/home_user/demographic.dart';
+import 'package:fyp_wyc/view/home_user/history.dart';
 import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:fyp_wyc/view/home_user/recipe_details.dart';
 import 'package:fyp_wyc/view/home_user/recipe_edit.dart';
@@ -73,7 +76,18 @@ List<RouteBase> routes() {
     ),
     GoRoute(
       path: '/${ViewData.forgot.path}',
-      builder: (context, state) => const ForgotPage(),
+      builder: (context, state) {
+        final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+        final String? email = extras['email'] as String?;
+        return ForgotPage(email: email);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.demographic.path}',
+      builder: (context, state) {
+        final User? user = LocalUserStore.currentUser;
+        return DemographicPage(user: user!);
+      },
     ),
     GoRoute(
       path: '/${ViewData.profileEdit.path}',
@@ -189,6 +203,24 @@ List<RouteBase> routes() {
       builder: (context, state) {
         final User user = state.extra as User;
         return AboutActivityPage(user: user);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.history.path}',
+      builder: (context, state) {
+        final List<Recipe> recipeList = RecipeStore.recipeList;
+        final User user = LocalUserStore.currentUser!;
+        return HistoryPage(recipeList: recipeList, user: user);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.author.path}',
+      builder: (context, state) {
+        final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+        final User user = LocalUserStore.currentUser!;
+        final User author = extras['author'] as User;
+        final List<Recipe> recipeList = RecipeStore.recipeList;
+        return AuthorPage(author: author, recipeList: recipeList, user: user);
       },
     ),
   ];

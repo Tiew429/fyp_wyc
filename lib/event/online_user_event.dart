@@ -63,5 +63,16 @@ class OnlineUserStore {
       return null;
     }
   }
+
+  static Future<User?> getAuthor(String email) async {
+    try {
+      // get user from firebase
+      FirebaseServices firebaseServices = FirebaseServices();
+      final user = await firebaseServices.getUserByEmail(email);
+      return user;
+    } catch (e) {
+      return null;
+    }
+  }
 }
 

@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     // for testing purpose, remove after complete
     _emailOrPhoneController.text = 'tiewjiajun0429@gmail.com';
-    _passwordController.text = '111111a';
+    _passwordController.text = 'aaaaaa1';
   }
 
   @override
@@ -75,12 +75,18 @@ class _LoginPageState extends State<LoginPage> {
 
     bool isSuccess = response['success'];
     String message = response['message'];
+    bool firstTimeLogin = response['firstTimeLogin'];
 
     // show snackbar
     MySnackBar.showSnackBar(message);
 
     if (isSuccess) {
-      navigatorKey.currentContext!.go('/${ViewData.dashboard.path}');
+      // check is first time login
+      if (firstTimeLogin) {
+        navigatorKey.currentContext!.go('/${ViewData.demographic.path}');
+      } else {
+        navigatorKey.currentContext!.go('/${ViewData.dashboard.path}');
+      }
     }
   }
 
@@ -120,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
             Spacer(),
             GestureDetector(
               onTap: () {
-                navigatorKey.currentContext!.push('/${ViewData.forgot.path}');
+                navigatorKey.currentContext!.push('/${ViewData.forgot.path}', extra: {'email': _emailOrPhoneController.text});
               },
               child: Text('Forgot password?',
                 style: TextStyle(

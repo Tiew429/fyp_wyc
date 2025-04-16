@@ -37,12 +37,37 @@ class _AboutActivityPageState extends State<AboutActivityPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _buildUserSection(),
+            SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.only(bottom: 64.0, left: 16.0, right: 16.0),
               child: _buildActivitySection(),
             ),
             SizedBox(height: 16.0),
             _buildLogOutSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserSection() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 205, 230, 173),
+        borderRadius: BorderRadius.circular(16.0),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10.0),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 16.0, right: 16.0),
+        child: Column(
+          children: [
+            _buildActivityItem('Viewed Recipes History', () => navigatorKey.currentContext!.push('/${ViewData.history.path}', extra: {
+              'user': user,
+            }), null),
           ],
         ),
       ),
