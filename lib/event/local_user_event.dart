@@ -147,11 +147,27 @@ class LocalUserStore {
     String gender,
     String occupation,
     String cookingFrequency,
+    String usuallyPlanMeals,
+    String comfortableUsingMobileOrWebApp,
+    String helpfulOfAppSuggestRecipesBasedOnIngredients,
+    String howOftenToStruggleToDecideWhatToCook,
+    String haveYouThrownAwayFoodBeforeExpired,
+    String howLikelyToUseAppToFindRecipes,
   ) async {
     try {
       FirebaseServices firebaseServices = FirebaseServices();
-      final response = await firebaseServices.updateDemographic(ageRange, gender, occupation, cookingFrequency);
-
+      final response = await firebaseServices.updateDemographic(
+        ageRange,
+        gender,
+        occupation,
+        cookingFrequency,
+        usuallyPlanMeals,
+        comfortableUsingMobileOrWebApp,
+        helpfulOfAppSuggestRecipesBasedOnIngredients,
+        howOftenToStruggleToDecideWhatToCook,
+        haveYouThrownAwayFoodBeforeExpired,
+        howLikelyToUseAppToFindRecipes,
+      );
       if (response['success']) {
         _currentUser = _currentUser?.copyWith(ageRange: ageRange, gender: gender, occupation: occupation, cookingFrequency: cookingFrequency);
 

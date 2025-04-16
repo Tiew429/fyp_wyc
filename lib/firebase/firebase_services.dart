@@ -208,14 +208,29 @@ class FirebaseServices {
     }
   }
 
-  Future<Map<String, dynamic>> updateDemographic(String ageRange, String gender, String occupation, String cookingFrequency) async {
+  Future<Map<String, dynamic>> updateDemographic(
+    String ageRange,
+    String gender,
+    String occupation,
+    String cookingFrequency,
+    String usuallyPlanMeals,
+    String comfortableUsingMobileOrWebApp,
+    String helpfulOfAppSuggestRecipesBasedOnIngredients,
+    String howOftenToStruggleToDecideWhatToCook,
+    String haveYouThrownAwayFoodBeforeExpired,
+    String howLikelyToUseAppToFindRecipes) async {
     try {
       await _userCollection.doc(auth.FirebaseAuth.instance.currentUser!.email).update({
         'ageRange': ageRange,
         'gender': gender,
         'occupation': occupation,
         'cookingFrequency': cookingFrequency,
-        'firstTimeLogin': false,
+        'usuallyPlanMeals': usuallyPlanMeals,
+        'comfortableUsingMobileOrWebApp': comfortableUsingMobileOrWebApp,
+        'helpfulOfAppSuggestRecipesBasedOnIngredients': helpfulOfAppSuggestRecipesBasedOnIngredients,
+        'howOftenToStruggleToDecideWhatToCook': howOftenToStruggleToDecideWhatToCook,
+        'haveYouThrownAwayFoodBeforeExpired': haveYouThrownAwayFoodBeforeExpired,
+        'howLikelyToUseAppToFindRecipes': howLikelyToUseAppToFindRecipes,
       });
 
       return {
@@ -523,6 +538,12 @@ class FirebaseServices {
       'firstTimeLogin': true,
       'occupation': '',
       'cookingFrequency': '',
+      'usuallyPlanMeals': '',
+      'comfortableUsingMobileOrWebApp': '',
+      'helpfulOfAppSuggestRecipesBasedOnIngredients': '',
+      'howOftenToStruggleToDecideWhatToCook': '',
+      'haveYouThrownAwayFoodBeforeExpired': '',
+      'howLikelyToUseAppToFindRecipes': '',
       'isBanned': false,
     });
 

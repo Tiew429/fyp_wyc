@@ -24,6 +24,12 @@ class _DemographicPageState extends State<DemographicPage> {
   String? gender;
   String? occupation;
   String? cookingFrequency;
+  String? usuallyPlanMeals;
+  String? comfortableUsingMobileOrWebApp;
+  String? helpfulOfAppSuggestRecipesBasedOnIngredients;
+  String? howOftenToStruggleToDecideWhatToCook;
+  String? haveYouThrownAwayFoodBeforeExpired;
+  String? howLikelyToUseAppToFindRecipes;
 
   @override
   void initState() {
@@ -53,6 +59,36 @@ class _DemographicPageState extends State<DemographicPage> {
       return false;
     }
     
+    if (usuallyPlanMeals == null || usuallyPlanMeals!.isEmpty) {
+      MySnackBar.showSnackBar('Please select if you usually plan your meals in advance');
+      return false;
+    }
+    
+    if (comfortableUsingMobileOrWebApp == null || comfortableUsingMobileOrWebApp!.isEmpty) {
+      MySnackBar.showSnackBar('Please select your comfort level using mobile or web applications');
+      return false;
+    }
+    
+    if (helpfulOfAppSuggestRecipesBasedOnIngredients == null || helpfulOfAppSuggestRecipesBasedOnIngredients!.isEmpty) {
+      MySnackBar.showSnackBar('Please select if you would find it helpful for an app to suggest recipes');
+      return false;
+    }
+    
+    if (howOftenToStruggleToDecideWhatToCook == null || howOftenToStruggleToDecideWhatToCook!.isEmpty) {
+      MySnackBar.showSnackBar('Please select how often you struggle to decide what to cook');
+      return false;
+    }
+    
+    if (haveYouThrownAwayFoodBeforeExpired == null || haveYouThrownAwayFoodBeforeExpired!.isEmpty) {
+      MySnackBar.showSnackBar('Please select if you have thrown away food');
+      return false;
+    }
+    
+    if (howLikelyToUseAppToFindRecipes == null || howLikelyToUseAppToFindRecipes!.isEmpty) {
+      MySnackBar.showSnackBar('Please select how likely you are to use an app to find recipes');
+      return false;
+    }
+    
     // All fields are filled
     return true;
   }
@@ -63,7 +99,18 @@ class _DemographicPageState extends State<DemographicPage> {
       return;
     }
     
-    final response = await LocalUserStore.updateDemographic(ageGroup!, gender!, occupation!, cookingFrequency!);
+    final response = await LocalUserStore.updateDemographic(
+      ageGroup!, 
+      gender!, 
+      occupation!, 
+      cookingFrequency!, 
+      usuallyPlanMeals!, 
+      comfortableUsingMobileOrWebApp!, 
+      helpfulOfAppSuggestRecipesBasedOnIngredients!, 
+      howOftenToStruggleToDecideWhatToCook!, 
+      haveYouThrownAwayFoodBeforeExpired!, 
+      howLikelyToUseAppToFindRecipes!
+    );
     MySnackBar.showSnackBar(response['message']);
     
     // navigate to dashboard page
@@ -216,6 +263,186 @@ class _DemographicPageState extends State<DemographicPage> {
                   }),
                   _buildSelectionButton('Never', cookingFrequency == 'Never', () {
                     setState(() => cookingFrequency = 'Never');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 30),
+              
+              // Meal planning section
+              const Text(
+                'Do you usually plan your meals in advance?',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSelectionButton('Yes', usuallyPlanMeals == 'Yes', () {
+                    setState(() => usuallyPlanMeals = 'Yes');
+                  }),
+                  _buildSelectionButton('No', usuallyPlanMeals == 'No', () {
+                    setState(() => usuallyPlanMeals = 'No');
+                  }),
+                  _buildSelectionButton('Sometimes', usuallyPlanMeals == 'Sometimes', () {
+                    setState(() => usuallyPlanMeals = 'Sometimes');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 30),
+              
+              // Mobile app comfort section
+              const Text(
+                'How comfortable are you with using mobile or web applications?',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSelectionButton('Very comfortable', comfortableUsingMobileOrWebApp == 'Very comfortable', () {
+                    setState(() => comfortableUsingMobileOrWebApp = 'Very comfortable');
+                  }),
+                  _buildSelectionButton('Somewhat comfortable', comfortableUsingMobileOrWebApp == 'Somewhat comfortable', () {
+                    setState(() => comfortableUsingMobileOrWebApp = 'Somewhat comfortable');
+                  }),
+                  _buildSelectionButton('Not very comfortable', comfortableUsingMobileOrWebApp == 'Not very comfortable', () {
+                    setState(() => comfortableUsingMobileOrWebApp = 'Not very comfortable');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 30),
+              
+              // App suggestions section
+              const Text(
+                'Would you find it helpful if an app could suggest recipes based on the ingredients you already have?',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSelectionButton('Yes', helpfulOfAppSuggestRecipesBasedOnIngredients == 'Yes', () {
+                    setState(() => helpfulOfAppSuggestRecipesBasedOnIngredients = 'Yes');
+                  }),
+                  _buildSelectionButton('No', helpfulOfAppSuggestRecipesBasedOnIngredients == 'No', () {
+                    setState(() => helpfulOfAppSuggestRecipesBasedOnIngredients = 'No');
+                  }),
+                  _buildSelectionButton('Maybe', helpfulOfAppSuggestRecipesBasedOnIngredients == 'Maybe', () {
+                    setState(() => helpfulOfAppSuggestRecipesBasedOnIngredients = 'Maybe');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 30),
+              
+              // Struggle to decide what to cook section
+              const Text(
+                'How often do you struggle to decide what to cook with the ingredients you have at home?',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSelectionButton('Very often', howOftenToStruggleToDecideWhatToCook == 'Very often', () {
+                    setState(() => howOftenToStruggleToDecideWhatToCook = 'Very often');
+                  }),
+                  _buildSelectionButton('Sometimes', howOftenToStruggleToDecideWhatToCook == 'Sometimes', () {
+                    setState(() => howOftenToStruggleToDecideWhatToCook = 'Sometimes');
+                  }),
+                  _buildSelectionButton('Rarely', howOftenToStruggleToDecideWhatToCook == 'Rarely', () {
+                    setState(() => howOftenToStruggleToDecideWhatToCook = 'Rarely');
+                  }),
+                  _buildSelectionButton('Never', howOftenToStruggleToDecideWhatToCook == 'Never', () {
+                    setState(() => howOftenToStruggleToDecideWhatToCook = 'Never');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 30),
+              
+              // Food waste section
+              const Text(
+                'Have you ever thrown away food because you didn\'t know how to use the ingredients before they expired?',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSelectionButton('Yes, frequently', haveYouThrownAwayFoodBeforeExpired == 'Yes, frequently', () {
+                    setState(() => haveYouThrownAwayFoodBeforeExpired = 'Yes, frequently');
+                  }),
+                  _buildSelectionButton('Occasionally', haveYouThrownAwayFoodBeforeExpired == 'Occasionally', () {
+                    setState(() => haveYouThrownAwayFoodBeforeExpired = 'Occasionally');
+                  }),
+                  _buildSelectionButton('Rarely', haveYouThrownAwayFoodBeforeExpired == 'Rarely', () {
+                    setState(() => haveYouThrownAwayFoodBeforeExpired = 'Rarely');
+                  }),
+                  _buildSelectionButton('Never', haveYouThrownAwayFoodBeforeExpired == 'Never', () {
+                    setState(() => haveYouThrownAwayFoodBeforeExpired = 'Never');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 30),
+              
+              // App usage likelihood section
+              const Text(
+                'How likely are you to use an app that can recognize ingredients through photos and suggest recipes?',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSelectionButton('Very likely', howLikelyToUseAppToFindRecipes == 'Very likely', () {
+                    setState(() => howLikelyToUseAppToFindRecipes = 'Very likely');
+                  }),
+                  _buildSelectionButton('Likely', howLikelyToUseAppToFindRecipes == 'Likely', () {
+                    setState(() => howLikelyToUseAppToFindRecipes = 'Likely');
+                  }),
+                  _buildSelectionButton('Neutral', howLikelyToUseAppToFindRecipes == 'Neutral', () {
+                    setState(() => howLikelyToUseAppToFindRecipes = 'Neutral');
+                  }),
+                  _buildSelectionButton('Unlikely', howLikelyToUseAppToFindRecipes == 'Unlikely', () {
+                    setState(() => howLikelyToUseAppToFindRecipes = 'Unlikely');
+                  }),
+                  _buildSelectionButton('Very unlikely', howLikelyToUseAppToFindRecipes == 'Very unlikely', () {
+                    setState(() => howLikelyToUseAppToFindRecipes = 'Very unlikely');
                   }),
                 ],
               ),

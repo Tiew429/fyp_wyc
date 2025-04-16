@@ -17,6 +17,12 @@ class User {
   bool firstTimeLogin;
   String occupation;
   String cookingFrequency;
+  String usuallyPlanMeals;
+  String comfortableUsingMobileOrWebApp;
+  String helpfulOfAppSuggestRecipesBasedOnIngredients;
+  String howOftenToStruggleToDecideWhatToCook;
+  String haveYouThrownAwayFoodBeforeExpired;
+  String howLikelyToUseAppToFindRecipes;
   bool isBanned;
 
   User({
@@ -36,6 +42,12 @@ class User {
     this.firstTimeLogin = true,
     this.occupation = '',
     this.cookingFrequency = '',
+    this.usuallyPlanMeals = '',
+    this.comfortableUsingMobileOrWebApp = '',
+    this.helpfulOfAppSuggestRecipesBasedOnIngredients = '',
+    this.howOftenToStruggleToDecideWhatToCook = '',
+    this.haveYouThrownAwayFoodBeforeExpired = '',
+    this.howLikelyToUseAppToFindRecipes = '',
     this.isBanned = false,
   });
 
@@ -57,6 +69,12 @@ class User {
       firstTimeLogin: json['firstTimeLogin'],
       occupation: json['occupation'],
       cookingFrequency: json['cookingFrequency'],
+      usuallyPlanMeals: json['usuallyPlanMeals'],
+      comfortableUsingMobileOrWebApp: json['comfortableUsingMobileOrWebApp'],
+      helpfulOfAppSuggestRecipesBasedOnIngredients: json['helpfulOfAppSuggestRecipesBasedOnIngredients'],
+      howOftenToStruggleToDecideWhatToCook: json['howOftenToStruggleToDecideWhatToCook'],
+      haveYouThrownAwayFoodBeforeExpired: json['haveYouThrownAwayFoodBeforeExpired'],
+      howLikelyToUseAppToFindRecipes: json['howLikelyToUseAppToFindRecipes'],
       isBanned: json['isBanned'],
     );
   }
@@ -79,6 +97,12 @@ class User {
       'firstTimeLogin': firstTimeLogin,
       'occupation': occupation,
       'cookingFrequency': cookingFrequency,
+      'usuallyPlanMeals': usuallyPlanMeals,
+      'comfortableUsingMobileOrWebApp': comfortableUsingMobileOrWebApp,
+      'helpfulOfAppSuggestRecipesBasedOnIngredients': helpfulOfAppSuggestRecipesBasedOnIngredients,
+      'howOftenToStruggleToDecideWhatToCook': howOftenToStruggleToDecideWhatToCook,
+      'haveYouThrownAwayFoodBeforeExpired': haveYouThrownAwayFoodBeforeExpired,
+      'howLikelyToUseAppToFindRecipes': howLikelyToUseAppToFindRecipes,
       'isBanned': isBanned,
     };
   }
@@ -96,11 +120,16 @@ class User {
     List<String>? savedRecipes,
     List<String>? addedRecipes,
     Map<String, dynamic>? recipeRating,
-    List<String>? searchHistory,
     Map<String, dynamic>? recipeHistory,
     bool? firstTimeLogin,
     String? occupation,
     String? cookingFrequency,
+    String? usuallyPlanMeals,
+    String? comfortableUsingMobileOrWebApp,
+    String? helpfulOfAppSuggestRecipesBasedOnIngredients,
+    String? howOftenToStruggleToDecideWhatToCook,
+    String? haveYouThrownAwayFoodBeforeExpired,
+    String? howLikelyToUseAppToFindRecipes,
     bool? isBanned,
   }) {
     return User(
@@ -120,6 +149,12 @@ class User {
       firstTimeLogin: firstTimeLogin ?? this.firstTimeLogin,
       occupation: occupation ?? this.occupation,
       cookingFrequency: cookingFrequency ?? this.cookingFrequency,
+      usuallyPlanMeals: usuallyPlanMeals ?? this.usuallyPlanMeals,
+      comfortableUsingMobileOrWebApp: comfortableUsingMobileOrWebApp ?? this.comfortableUsingMobileOrWebApp,
+      helpfulOfAppSuggestRecipesBasedOnIngredients: helpfulOfAppSuggestRecipesBasedOnIngredients ?? this.helpfulOfAppSuggestRecipesBasedOnIngredients,
+      howOftenToStruggleToDecideWhatToCook: howOftenToStruggleToDecideWhatToCook ?? this.howOftenToStruggleToDecideWhatToCook,
+      haveYouThrownAwayFoodBeforeExpired: haveYouThrownAwayFoodBeforeExpired ?? this.haveYouThrownAwayFoodBeforeExpired,
+      howLikelyToUseAppToFindRecipes: howLikelyToUseAppToFindRecipes ?? this.howLikelyToUseAppToFindRecipes,
       isBanned: isBanned ?? this.isBanned,
     );
   }

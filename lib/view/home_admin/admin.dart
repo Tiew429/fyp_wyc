@@ -33,7 +33,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   void initState() {
     super.initState();
-    _selectedIndex = 1;
+    _selectedIndex = 2;
     recipeList = widget.recipeList;
     userList = widget.userList;
 

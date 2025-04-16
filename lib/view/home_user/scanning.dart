@@ -24,12 +24,13 @@ class ScanningPage extends StatefulWidget {
 }
 
 class _ScanningPageState extends State<ScanningPage> {
-  late final XFile _image;
+  late XFile _image;
   late final Interpreter _interpreter;
   late final List<String> _labels;
   List<Map<String, dynamic>> predictions = [];
   List<String> selectedIngredients = [];
   bool isScanning = false;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -48,6 +49,39 @@ class _ScanningPageState extends State<ScanningPage> {
   Future<void> _loadLabels() async {
     final labelsData = await rootBundle.loadString('assets/model/labels.txt');
     _labels = labelsData.split('\n');
+  }
+
+  Future<void> _scanAgain(ImageSource source) async {
+    final XFile? image = await _picker.pickImage(source: source);
+    if (image != null) {
+      setState(() {
+        _image = image;
+      });
+      _scanImage();
+    }
+  }
+
+  void _showImageSourceOptions() {
+    showModalBottomSheet(
+      context: context,
+      constraints: BoxConstraints(
+        maxHeight: 120, // Height for exactly two ListTiles
+      ),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min, // Use minimum space needed
+        children: [
+          ListTile(
+            title: Text('Take Photo'),
+            onTap: () async => await _scanAgain(ImageSource.camera),
+          ),
+          Divider(height: 1, thickness: 1),
+          ListTile(
+            title: Text('Pick Image'),
+            onTap: () async => await _scanAgain(ImageSource.gallery),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _scanImage() async {
@@ -117,9 +151,8 @@ class _ScanningPageState extends State<ScanningPage> {
     final indexedResults = results.asMap().entries.toList();
     indexedResults.sort((a, b) => b.value.compareTo(a.value));
 
-    // 9. Get predictions (ingredients that are in the image have more than 20% confidence)
-    final topPredictions = indexedResults.where((entry) {
-      // final idx = entry.key;
+    // 9. Get predictions (ingredients that are in the image have more than 10% confidence)
+    final newPredictions = indexedResults.where((entry) {
       final confidence = entry.value;
       return confidence > 0.1;
     }).map((entry) {
@@ -131,12 +164,14 @@ class _ScanningPageState extends State<ScanningPage> {
       };
     }).toList();
 
-    // 10. Update UI
+    // 10. Update UI with merged predictions (avoiding duplicates)
     setState(() {
-      predictions = topPredictions;
-    });
-    
-    setState(() {
+      // Merge predictions without duplicates
+      for (var newPred in newPredictions) {
+        if (!predictions.any((pred) => pred['label'] == newPred['label'])) {
+          predictions.add(newPred);
+        }
+      }
       isScanning = false;
     });
   }
@@ -209,6 +244,12 @@ class _ScanningPageState extends State<ScanningPage> {
             ),
           ),
           const SizedBox(height: 20),
+          Text('Please select the ingredients you see in the image',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 20),
           SizedBox(
             height: 200,
             child: SingleChildScrollView(
@@ -234,9 +275,21 @@ class _ScanningPageState extends State<ScanningPage> {
             ),
           ),
           const SizedBox(height: 20),
-          MyButton(
-            onPressed: _onContinue,
-            text: 'Continue with Selected Ingredients',
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              MyButton(
+                onPressed: _showImageSourceOptions,
+                text: 'Scan Again',
+                backgroundColor: Colors.blue,
+                width: MediaQuery.of(context).size.width * 0.4,
+              ),
+              MyButton(
+                onPressed: _onContinue,
+                text: 'Continue',
+                width: MediaQuery.of(context).size.width * 0.4,
+              ),
+            ],
           ),
         ],
       ),

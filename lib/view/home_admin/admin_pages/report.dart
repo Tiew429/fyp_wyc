@@ -23,6 +23,14 @@ class _ReportPageState extends State<ReportPage> {
   // Maps to store calculated statistics
   Map<String, int> ageGroups = {};
   Map<String, int> genderGroups = {};
+  Map<String, int> occupationGroups = {};
+  Map<String, int> cookingFrequencyGroups = {};
+  Map<String, int> mealPlanningGroups = {};
+  Map<String, int> appComfortGroups = {};
+  Map<String, int> recipeAppGroups = {};
+  Map<String, int> struggleGroups = {};
+  Map<String, int> foodWasteGroups = {};
+  Map<String, int> appLikelihoodGroups = {};
   
   @override
   void initState() {
@@ -91,6 +99,15 @@ class _ReportPageState extends State<ReportPage> {
       'Prefer not to say': 0,
     };
     
+    occupationGroups = {};
+    cookingFrequencyGroups = {};
+    mealPlanningGroups = {'Yes': 0, 'No': 0, 'Sometimes': 0};
+    appComfortGroups = {'Very comfortable': 0, 'Somewhat comfortable': 0, 'Not very comfortable': 0};
+    recipeAppGroups = {'Yes': 0, 'No': 0, 'Maybe': 0};
+    struggleGroups = {'Very often': 0, 'Sometimes': 0, 'Rarely': 0, 'Never': 0};
+    foodWasteGroups = {'Yes, frequently': 0, 'Occasionally': 0, 'Rarely': 0, 'Never': 0};
+    appLikelihoodGroups = {'Very likely': 0, 'Likely': 0, 'Neutral': 0, 'Unlikely': 0, 'Very unlikely': 0};
+    
     // Count users by age group and gender
     for (final user in filteredUsers) {
       // Age groups - normalize the format (remove spaces)
@@ -110,6 +127,51 @@ class _ReportPageState extends State<ReportPage> {
       // Gender
       if (genderGroups.containsKey(user.gender)) {
         genderGroups[user.gender] = (genderGroups[user.gender] ?? 0) + 1;
+      }
+      
+      // Occupation
+      if (user.occupation.isNotEmpty) {
+        occupationGroups[user.occupation] = (occupationGroups[user.occupation] ?? 0) + 1;
+      }
+      
+      // Cooking frequency
+      if (user.cookingFrequency.isNotEmpty) {
+        cookingFrequencyGroups[user.cookingFrequency] = (cookingFrequencyGroups[user.cookingFrequency] ?? 0) + 1;
+      }
+      
+      // Meal planning
+      if (user.usuallyPlanMeals.isNotEmpty) {
+        mealPlanningGroups[user.usuallyPlanMeals] = (mealPlanningGroups[user.usuallyPlanMeals] ?? 0) + 1;
+      }
+      
+      // App comfort
+      if (user.comfortableUsingMobileOrWebApp.isNotEmpty) {
+        appComfortGroups[user.comfortableUsingMobileOrWebApp] = 
+            (appComfortGroups[user.comfortableUsingMobileOrWebApp] ?? 0) + 1;
+      }
+      
+      // Recipe app helpfulness
+      if (user.helpfulOfAppSuggestRecipesBasedOnIngredients.isNotEmpty) {
+        recipeAppGroups[user.helpfulOfAppSuggestRecipesBasedOnIngredients] = 
+            (recipeAppGroups[user.helpfulOfAppSuggestRecipesBasedOnIngredients] ?? 0) + 1;
+      }
+      
+      // Struggle to decide what to cook
+      if (user.howOftenToStruggleToDecideWhatToCook.isNotEmpty) {
+        struggleGroups[user.howOftenToStruggleToDecideWhatToCook] = 
+            (struggleGroups[user.howOftenToStruggleToDecideWhatToCook] ?? 0) + 1;
+      }
+      
+      // Food waste
+      if (user.haveYouThrownAwayFoodBeforeExpired.isNotEmpty) {
+        foodWasteGroups[user.haveYouThrownAwayFoodBeforeExpired] = 
+            (foodWasteGroups[user.haveYouThrownAwayFoodBeforeExpired] ?? 0) + 1;
+      }
+      
+      // App usage likelihood
+      if (user.howLikelyToUseAppToFindRecipes.isNotEmpty) {
+        appLikelihoodGroups[user.howLikelyToUseAppToFindRecipes] = 
+            (appLikelihoodGroups[user.howLikelyToUseAppToFindRecipes] ?? 0) + 1;
       }
     }
   }
@@ -182,6 +244,136 @@ class _ReportPageState extends State<ReportPage> {
     }
     
     return result;
+  }
+  
+  // Format meal planning groups for display
+  List<String> _formatMealPlanningGroups() {
+    List<String> result = [];
+    
+    // Add entries in a specific order
+    for (String key in ['Yes', 'No', 'Sometimes']) {
+      if (mealPlanningGroups.containsKey(key)) {
+        result.add("$key: ${_calculatePercentage(mealPlanningGroups[key] ?? 0)}");
+      }
+    }
+    
+    return result;
+  }
+  
+  // Format app comfort groups for display
+  List<String> _formatAppComfortGroups() {
+    List<String> result = [];
+    
+    // Add entries in a specific order
+    for (String key in ['Very comfortable', 'Somewhat comfortable', 'Not very comfortable']) {
+      if (appComfortGroups.containsKey(key)) {
+        result.add("$key: ${_calculatePercentage(appComfortGroups[key] ?? 0)}");
+      }
+    }
+    
+    return result;
+  }
+  
+  // Format recipe app helpfulness groups for display
+  List<String> _formatRecipeAppGroups() {
+    List<String> result = [];
+    
+    // Add entries in a specific order
+    for (String key in ['Yes', 'No', 'Maybe']) {
+      if (recipeAppGroups.containsKey(key)) {
+        result.add("$key: ${_calculatePercentage(recipeAppGroups[key] ?? 0)}");
+      }
+    }
+    
+    return result;
+  }
+  
+  // Format struggle groups for display
+  List<String> _formatStruggleGroups() {
+    List<String> result = [];
+    
+    // Add entries in a specific order
+    for (String key in ['Very often', 'Sometimes', 'Rarely', 'Never']) {
+      if (struggleGroups.containsKey(key)) {
+        result.add("$key: ${_calculatePercentage(struggleGroups[key] ?? 0)}");
+      }
+    }
+    
+    return result;
+  }
+  
+  // Format food waste groups for display
+  List<String> _formatFoodWasteGroups() {
+    List<String> result = [];
+    
+    // Add entries in a specific order
+    for (String key in ['Yes, frequently', 'Occasionally', 'Rarely', 'Never']) {
+      if (foodWasteGroups.containsKey(key)) {
+        result.add("$key: ${_calculatePercentage(foodWasteGroups[key] ?? 0)}");
+      }
+    }
+    
+    return result;
+  }
+  
+  // Format app likelihood groups for display
+  List<String> _formatAppLikelihoodGroups() {
+    List<String> result = [];
+    
+    // Add entries in a specific order
+    for (String key in ['Very likely', 'Likely', 'Neutral', 'Unlikely', 'Very unlikely']) {
+      if (appLikelihoodGroups.containsKey(key)) {
+        result.add("$key: ${_calculatePercentage(appLikelihoodGroups[key] ?? 0)}");
+      }
+    }
+    
+    return result;
+  }
+  
+  // Format occupation groups for display
+  List<String> _formatOccupationGroups() {
+    if (occupationGroups.isEmpty) return ["No data available"];
+    
+    // Sort by occupation name
+    List<String> keys = occupationGroups.keys.toList()..sort();
+    
+    return keys.map((key) => 
+      "$key: ${_calculatePercentage(occupationGroups[key] ?? 0)}"
+    ).toList();
+  }
+  
+  // Format cooking frequency groups for display
+  List<String> _formatCookingFrequencyGroups() {
+    if (cookingFrequencyGroups.isEmpty) return ["No data available"];
+    
+    // Define the cooking frequency order from least to most frequent
+    final frequencyOrder = [
+      'Never',
+      'Rarely',
+      'Sometimes',
+      'Often',
+      'Very Often',
+      'Daily',
+    ];
+    
+    // Try to sort by the predefined order if possible
+    List<String> keys = cookingFrequencyGroups.keys.toList();
+    keys.sort((a, b) {
+      int aIndex = frequencyOrder.indexOf(a);
+      int bIndex = frequencyOrder.indexOf(b);
+      
+      // If both are in the predefined list, sort by that order
+      if (aIndex >= 0 && bIndex >= 0) {
+        return aIndex.compareTo(bIndex);
+      }
+      
+      // Otherwise, sort alphabetically
+      return a.compareTo(b);
+    });
+    
+    return keys.map((key) => 
+      "$key: ${_calculatePercentage(cookingFrequencyGroups[key] ?? 0)}"
+    ).toList();
   }
 
   @override
@@ -278,6 +470,70 @@ class _ReportPageState extends State<ReportPage> {
                     _buildStatisticCard(
                       "2. What is your gender?",
                       _formatGenderGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // Occupation
+                    _buildStatisticCard(
+                      "3. What is your occupation?",
+                      _formatOccupationGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // Cooking Frequency
+                    _buildStatisticCard(
+                      "4. How often do you cook?",
+                      _formatCookingFrequencyGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // Meal Planning
+                    _buildStatisticCard(
+                      "5. Do you usually plan your meals in advance?",
+                      _formatMealPlanningGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // App Comfort
+                    _buildStatisticCard(
+                      "6. How comfortable are you with using mobile or web apps?",
+                      _formatAppComfortGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // Recipe App Helpfulness
+                    _buildStatisticCard(
+                      "7. Would you find it helpful if an app suggests recipes based on your ingredients?",
+                      _formatRecipeAppGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // Struggle to Decide
+                    _buildStatisticCard(
+                      "8. How often do you struggle to decide what to cook?",
+                      _formatStruggleGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // Food Waste
+                    _buildStatisticCard(
+                      "9. Have you thrown away food because you didn't know how to use it?",
+                      _formatFoodWasteGroups(),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // App Likelihood
+                    _buildStatisticCard(
+                      "10. How likely are you to use an app to recognize ingredients and find recipes?",
+                      _formatAppLikelihoodGroups(),
                     ),
                   ],
                 ),
