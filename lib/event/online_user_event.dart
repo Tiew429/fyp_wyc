@@ -7,16 +7,19 @@ import 'package:fyp_wyc/model/user.dart';
 class OnlineUserEvent {
   final User? user;
   final Image? avatar;
+  final List<User>? userList;
 
-  OnlineUserEvent({this.user, this.avatar});
+  OnlineUserEvent({this.user, this.avatar, this.userList});
 }
 
 class OnlineUserStore {
   static User? _currentUser;
   static Image? _currentUserAvatar;
+  static List<User>? _userList;
 
   static User? get currentUser => _currentUser;
   static Image? get currentUserAvatar => _currentUserAvatar;
+  static List<User>? get userList => _userList;
 
   static void setCurrentUser(User user) {
     _currentUser = user;
@@ -64,12 +67,17 @@ class OnlineUserStore {
     }
   }
 
-  static Future<User?> getAuthor(String email) async {
+  static Future<List<User>?> getUserList() async {
     try {
-      // get user from firebase
+      // get user list from firebase
       FirebaseServices firebaseServices = FirebaseServices();
-      final user = await firebaseServices.getUserByEmail(email);
-      return user;
+      final userList = await firebaseServices.getUserList();
+
+      // set the user list to the store
+      _userList = userList;
+
+      // fire event when user list is changed
+      AppEventBus.instance.fire(OnlineUserEvent(userList: userList));
     } catch (e) {
       return null;
     }

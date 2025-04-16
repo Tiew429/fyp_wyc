@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_wyc/data/my_shared_preferences.dart';
 import 'package:fyp_wyc/data/viewdata.dart';
+import 'package:fyp_wyc/event/online_user_event.dart';
 import 'package:fyp_wyc/event/recipe_event.dart';
 import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/firebase/firebase_services.dart';
@@ -8,6 +9,7 @@ import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
+import 'package:fyp_wyc/view/home_admin/admin.dart';
 import 'package:fyp_wyc/view/home_user/about_activity.dart';
 import 'package:fyp_wyc/view/home_user/author_page.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
@@ -221,6 +223,47 @@ List<RouteBase> routes() {
         final User author = extras['author'] as User;
         final List<Recipe> recipeList = RecipeStore.recipeList;
         return AuthorPage(author: author, recipeList: recipeList, user: user);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.admin.path}',
+      builder: (context, state) {
+        return FutureBuilder(
+          future: Future.wait([
+            OnlineUserStore.getUserList(),
+            RecipeStore.getRecipeList(),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            
+            if (snapshot.hasError) {
+              return Scaffold(
+                body: Center(
+                  child: Text('Error: ${snapshot.error}'),
+                ),
+              );
+            }
+            
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const Scaffold(
+                body: Center(
+                  child: Text('No data available'),
+                ),
+              );
+            }
+
+            final userList = OnlineUserStore.userList;
+            final recipeList = RecipeStore.recipeList;
+            
+            return AdminPage(userList: userList, recipeList: recipeList);
+          },
+        );
       },
     ),
   ];

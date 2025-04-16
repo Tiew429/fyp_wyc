@@ -32,8 +32,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     // for testing purpose, remove after complete
-    _emailOrPhoneController.text = 'tiewjiajun0429@gmail.com';
-    _passwordController.text = 'aaaaaa1';
+    _emailOrPhoneController.text = 'wongyc-wp21@student.tarc.edu.my';
+    _passwordController.text = 'admin1111';
   }
 
   @override
@@ -52,9 +52,18 @@ class _LoginPageState extends State<LoginPage> {
       isLoginLoading = true;
     });
 
+    // check is admin login
+    FirebaseServices firebaseServices = FirebaseServices();
+    bool isAdmin = await firebaseServices.checkAdminLogin(_emailOrPhoneController.text, _passwordController.text);
+    if (isAdmin) {
+      navigatorKey.currentContext!.go('/${ViewData.admin.path}');
+      return;
+    }
+
     Map<String, dynamic> response = {
       'success': false,
       'message': '',
+      'firstTimeLogin': false,
     };
     String emailOrPhone = _emailOrPhoneController.text.toLowerCase();
     String password = _passwordController.text;
@@ -62,7 +71,6 @@ class _LoginPageState extends State<LoginPage> {
     // check is email or phone number
     if (emailOrPhone.contains('@')) {
       // email
-      FirebaseServices firebaseServices = FirebaseServices();
       response = await firebaseServices.signInWithEmail(emailOrPhone, password);
     } else {
       // phone number

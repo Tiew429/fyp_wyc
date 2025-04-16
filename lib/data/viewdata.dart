@@ -10,7 +10,8 @@ enum ViewData {
   scanResult,
   aboutActivity,
   history,
-  author;
+  author,
+  admin;
 
   String get path => name;
 }

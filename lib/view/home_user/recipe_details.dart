@@ -96,12 +96,10 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   }
 
   Future<void> _onAuthorTap() async {
-    // get the author first
-    final User? author = await OnlineUserStore.getAuthor(recipe.authorEmail);
-    if (author != null) {
+    if (creator != null) {
       navigatorKey.currentContext!.push(
         '/${ViewData.author.path}',
-        extra: {'author': author},
+        extra: {'author': creator},
       );
     }
   }

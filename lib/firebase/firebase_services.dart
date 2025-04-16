@@ -30,6 +30,25 @@ class FirebaseServices {
     );
   }
 
+  Future<bool> checkAdminLogin(String email, String password) async {
+    try {
+      final adminData = await _adminCollection.doc('admin').get();
+
+      if (adminData['email'] != email) {
+        return false;
+      }
+
+      await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> adminSignOut() async {
+    await _firebaseAuth.signOut();
+  }
+
   Future<Map<String, dynamic>> signUp(String email, String phone, String username, String password) async {
     try {
       // check if email and phone exists in firestore
@@ -116,6 +135,7 @@ class FirebaseServices {
           result = {
             'success': false,
             'message': 'The email address is not found',
+            'firstTimeLogin': false,
           };
         }
 
@@ -131,7 +151,6 @@ class FirebaseServices {
 
         // set user to user provider
         await LocalUserStore.setCurrentUser(user);
-
         result = {
           'success': true,
           'message': 'Logged in successfully',
@@ -141,6 +160,7 @@ class FirebaseServices {
         return {
           'success': false,
           'message': 'Error occured when signing in: $e',
+          'firstTimeLogin': false,
         };
       }
 
@@ -489,6 +509,7 @@ class FirebaseServices {
     }
   }
 
+  CollectionReference<Map<String, dynamic>> get _adminCollection => _firebaseFirestore.collection('admin');
   CollectionReference<Map<String, dynamic>> get _userCollection => _firebaseFirestore.collection('users');
   CollectionReference<Map<String, dynamic>> get _recipeCollection => _firebaseFirestore.collection('recipes');
 
@@ -523,6 +544,15 @@ class FirebaseServices {
     try {
       final userData = await _userCollection.doc(email).get();
       return User.fromJson(userData.data()!);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<User>?> getUserList() async {
+    try {
+      final userData = await _userCollection.get();
+      return userData.docs.map((doc) => User.fromJson(doc.data())).toList();
     } catch (e) {
       return null;
     }
