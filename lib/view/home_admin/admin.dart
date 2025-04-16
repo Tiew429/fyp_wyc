@@ -33,7 +33,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   void initState() {
     super.initState();
-    _selectedIndex = 0;
+    _selectedIndex = 1;
     recipeList = widget.recipeList;
     userList = widget.userList;
 
@@ -48,6 +48,13 @@ class _AdminPageState extends State<AdminPage> {
       'User List',
       'Report',
     ];
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    userList = null;
+    recipeList = null;
   }
 
   @override

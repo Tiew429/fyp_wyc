@@ -81,6 +81,59 @@ class OnlineUserStore {
     } catch (e) {
       return null;
     }
+    return _userList;
+  }
+
+  static Future<Map<String, dynamic>> deleteUser(String email) async {
+    try {
+      // Delete user from Firebase
+      FirebaseServices firebaseServices = FirebaseServices();
+      final result = await firebaseServices.deleteUser(email);
+      
+      if (result['success']) {
+        // Update the user list if deletion was successful
+        if (_userList != null) {
+          _userList!.removeWhere((user) => user.email == email);
+          
+          // Fire event to update UI
+          AppEventBus.instance.fire(OnlineUserEvent(userList: _userList));
+        }
+      }
+      
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred when deleting user: $e',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> toggleUserBanStatus(String email, bool isBanned) async {
+    try {
+      // Update user ban status in Firebase
+      FirebaseServices firebaseServices = FirebaseServices();
+      final result = await firebaseServices.toggleUserBanStatus(email, isBanned);
+      
+      if (result['success'] && _userList != null) {
+        // Update the user in the local list
+        final index = _userList!.indexWhere((user) => user.email == email);
+        if (index != -1) {
+          _userList![index].isBanned = isBanned;
+          
+          // Fire event to update UI
+          AppEventBus.instance.fire(OnlineUserEvent(userList: _userList));
+        }
+      }
+      
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred when ${isBanned ? "banning" : "unbanning"} user: $e',
+        'isBanned': !isBanned
+      };
+    }
   }
 }
 

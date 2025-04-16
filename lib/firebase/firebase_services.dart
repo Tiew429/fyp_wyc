@@ -130,6 +130,14 @@ class FirebaseServices {
         final userData = await _userCollection.doc(email).get();
         final User user = User.fromJson(userData.data()!);
 
+        if (user.isBanned) {
+          await _firebaseAuth.signOut();
+          return {
+            'success': false,
+            'message': 'Your account has been banned',
+          };
+        }
+        
         // set user to user provider
         await LocalUserStore.setCurrentUser(user);
         result = {
@@ -513,6 +521,9 @@ class FirebaseServices {
       'recipeRating': {},
       'recipeHistory': {},
       'firstTimeLogin': true,
+      'occupation': '',
+      'cookingFrequency': '',
+      'isBanned': false,
     });
 
     return {
@@ -563,6 +574,56 @@ class FirebaseServices {
       return userData.docs.map((doc) => User.fromJson(doc.data())).toList();
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteUser(String email) async {
+    try {
+      // First delete from Firestore
+      await _userCollection.doc(email).delete();
+      
+      // Try to delete the user's avatar if it exists
+      try {
+        await _firebaseStorage.ref().child('users/$email').delete();
+      } catch (e) {
+        // Silently fail if avatar doesn't exist
+      }
+      
+      // Note: For complete deletion, you would need admin privileges 
+      // to delete the actual Firebase Auth account
+
+      return {
+        'success': true,
+        'message': 'User deleted successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred when deleting user: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> toggleUserBanStatus(String email, bool isBanned) async {
+    try {
+      // Update the user's isBanned status in Firestore
+      await _userCollection.doc(email).update({
+        'isBanned': isBanned
+      });
+      
+      return {
+        'success': true,
+        'message': isBanned 
+            ? 'User has been banned successfully' 
+            : 'User has been unbanned successfully',
+        'isBanned': isBanned
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred when ${isBanned ? "banning" : "unbanning"} user: $e',
+        'isBanned': !isBanned // Return the original state since the operation failed
+      };
     }
   }
 }

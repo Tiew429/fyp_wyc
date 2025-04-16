@@ -17,6 +17,7 @@ class User {
   bool firstTimeLogin;
   String occupation;
   String cookingFrequency;
+  bool isBanned;
 
   User({
     required this.email,
@@ -35,6 +36,7 @@ class User {
     this.firstTimeLogin = true,
     this.occupation = '',
     this.cookingFrequency = '',
+    this.isBanned = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -55,6 +57,7 @@ class User {
       firstTimeLogin: json['firstTimeLogin'],
       occupation: json['occupation'],
       cookingFrequency: json['cookingFrequency'],
+      isBanned: json['isBanned'],
     );
   }
 
@@ -76,6 +79,7 @@ class User {
       'firstTimeLogin': firstTimeLogin,
       'occupation': occupation,
       'cookingFrequency': cookingFrequency,
+      'isBanned': isBanned,
     };
   }
 
@@ -97,6 +101,7 @@ class User {
     bool? firstTimeLogin,
     String? occupation,
     String? cookingFrequency,
+    bool? isBanned,
   }) {
     return User(
       email: email ?? this.email,
@@ -115,6 +120,7 @@ class User {
       firstTimeLogin: firstTimeLogin ?? this.firstTimeLogin,
       occupation: occupation ?? this.occupation,
       cookingFrequency: cookingFrequency ?? this.cookingFrequency,
+      isBanned: isBanned ?? this.isBanned,
     );
   }
 }

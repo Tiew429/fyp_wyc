@@ -94,8 +94,14 @@ List<RouteBase> routes() {
     GoRoute(
       path: '/${ViewData.profileEdit.path}',
       builder: (context, state) {
-        User? currentUser = LocalUserStore.currentUser;
-        // there is no way to navigate to this page if there is no user, so use ! to bypass the null check
+        final dynamic extras = state.extra;
+        User? currentUser;
+        
+        if (extras is Map<String, dynamic>) {
+          currentUser = extras['user'] as User?;
+        } else if (extras is User) {
+          currentUser = extras;
+        }
         return ProfileEditPage(user: currentUser!);
       },
     ),
@@ -170,8 +176,7 @@ List<RouteBase> routes() {
         final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
         final Recipe recipe = extras['recipe'] as Recipe;
         final User? user = extras['user'] as User?;
-        final bool? isAdmin = extras['isAdmin'] as bool?;
-        return RecipeDetailsPage(recipe: recipe, user: user, isAdmin: isAdmin);
+        return RecipeDetailsPage(recipe: recipe, user: user);
       },
     ),
     GoRoute(

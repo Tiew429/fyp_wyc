@@ -119,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(height: 30),
                   // edit profile
                   GestureDetector(
-                    onTap: () => navigatorKey.currentContext!.push('/${ViewData.profileEdit.path}'),
+                    onTap: () => navigatorKey.currentContext!.push('/${ViewData.profileEdit.path}', extra: user),
                     child: Text('edit your profile',
                       style: TextStyle(
                         fontSize: 20,

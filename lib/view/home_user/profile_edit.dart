@@ -157,7 +157,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       children: [
         MyAvatar(
           radius: screenSize.width * 0.13,
-          image: _imageFile != null ? Image.file(File(_imageFile!.path)) : LocalUserStore.currentUserAvatar,
+          image: _imageFile != null ? Image.file(File(_imageFile!.path)) : 
+            currentUser.avatarUrl != '' ? Image.network(currentUser.avatarUrl) : null,
         ),
         Positioned(
           bottom: 0,

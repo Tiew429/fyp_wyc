@@ -33,6 +33,8 @@ class _LoginPageState extends State<LoginPage> {
     // for testing purpose, remove after complete
     _emailOrPhoneController.text = 'wongyc-wp21@student.tarc.edu.my';
     _passwordController.text = 'admin1111';
+    // _emailOrPhoneController.text = 'tiewjiajun0429@gmail.com';
+    // _passwordController.text = 'aaaaaa1';
   }
 
   @override
@@ -81,13 +83,13 @@ class _LoginPageState extends State<LoginPage> {
 
     bool isSuccess = response['success'];
     String message = response['message'];
-    bool firstTimeLogin = response['firstTimeLogin'];
 
     // show snackbar
     MySnackBar.showSnackBar(message);
 
     if (isSuccess) {
       // check is first time login
+      bool firstTimeLogin = response['firstTimeLogin'];
       if (firstTimeLogin) {
         navigatorKey.currentContext!.go('/${ViewData.demographic.path}');
       } else {
