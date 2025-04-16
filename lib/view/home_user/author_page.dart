@@ -168,7 +168,7 @@ class _AuthorPageState extends State<AuthorPage> with SingleTickerProviderStateM
                 // Age range if available
                 if (author.ageRange.isNotEmpty)
                   Text(
-                    author.ageRange,
+                    "Age: ${author.ageRange}",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey.shade700,

@@ -201,6 +201,28 @@ class FirebaseServices {
     }
   }
 
+  Future<Map<String, dynamic>> updateDemographic(String ageRange, String gender, String occupation, String cookingFrequency) async {
+    try {
+      await _userCollection.doc(auth.FirebaseAuth.instance.currentUser!.email).update({
+        'ageRange': ageRange,
+        'gender': gender,
+        'occupation': occupation,
+        'cookingFrequency': cookingFrequency,
+        'firstTimeLogin': false,
+      });
+
+      return {
+        'success': true,
+        'message': 'Demographic updated successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when updating demographic: $e',
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> addRecipe(Recipe recipe) async {
     try {
       // check the number of recipe in firestore, then define the recipe id

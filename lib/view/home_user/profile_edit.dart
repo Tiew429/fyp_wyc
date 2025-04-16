@@ -239,7 +239,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 _onChangeSaveable();
               });
             },
-            items: ['Male', 'Female', 'Not to say'].map((String value) {
+            items: ['Male', 'Female', 'Prefer not to say'].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),

@@ -15,6 +15,8 @@ class User {
   Map<String, dynamic> recipeRating; // map of recipe id to rating (recipeID -> rating(int))
   Map<String, dynamic> recipeHistory; // map of recipe id to datetime (recipeID -> datetime(iso8601 string))
   bool firstTimeLogin;
+  String occupation;
+  String cookingFrequency;
 
   User({
     required this.email,
@@ -31,6 +33,8 @@ class User {
     this.recipeRating = const {},
     this.recipeHistory = const {},
     this.firstTimeLogin = true,
+    this.occupation = '',
+    this.cookingFrequency = '',
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -49,6 +53,8 @@ class User {
       recipeRating: json['recipeRating'],
       recipeHistory: json['recipeHistory'],
       firstTimeLogin: json['firstTimeLogin'],
+      occupation: json['occupation'],
+      cookingFrequency: json['cookingFrequency'],
     );
   }
 
@@ -68,6 +74,8 @@ class User {
       'recipeRating': recipeRating,
       'recipeHistory': recipeHistory,
       'firstTimeLogin': firstTimeLogin,
+      'occupation': occupation,
+      'cookingFrequency': cookingFrequency,
     };
   }
 
@@ -87,6 +95,8 @@ class User {
     List<String>? searchHistory,
     Map<String, dynamic>? recipeHistory,
     bool? firstTimeLogin,
+    String? occupation,
+    String? cookingFrequency,
   }) {
     return User(
       email: email ?? this.email,
@@ -103,6 +113,8 @@ class User {
       recipeRating: recipeRating ?? this.recipeRating,
       recipeHistory: recipeHistory ?? this.recipeHistory,
       firstTimeLogin: firstTimeLogin ?? this.firstTimeLogin,
+      occupation: occupation ?? this.occupation,
+      cookingFrequency: cookingFrequency ?? this.cookingFrequency,
     );
   }
 }

@@ -140,6 +140,34 @@ class LocalUserStore {
     }
   }
 
+  static Future<Map<String, dynamic>> updateDemographic(
+    String ageRange,
+    String gender,
+    String occupation,
+    String cookingFrequency,
+  ) async {
+    try {
+      FirebaseServices firebaseServices = FirebaseServices();
+      final response = await firebaseServices.updateDemographic(ageRange, gender, occupation, cookingFrequency);
+
+      if (response['success']) {
+        _currentUser = _currentUser?.copyWith(ageRange: ageRange, gender: gender, occupation: occupation, cookingFrequency: cookingFrequency);
+
+        // update user in shared preferences
+        await MySharedPreferences.saveUser(_currentUser!);
+
+        // fire event when user data is changed
+        AppEventBus.instance.fire(LocalUserEvent(user: _currentUser!));
+      }
+
+      return response;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occured when updating user demographic: $e',
+      };
+    }
+  }
   static Future<Map<String, dynamic>> submitRecipeRating(String recipeID, double rating) async {
     try {
       FirebaseServices firebaseServices = FirebaseServices();
