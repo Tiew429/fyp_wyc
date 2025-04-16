@@ -106,6 +106,9 @@ class _DemographicPageState extends State<DemographicPage> {
                 runSpacing: 12,
                 alignment: WrapAlignment.center,
                 children: [
+                  _buildSelectionButton('below 12', ageGroup == 'below 12', () {
+                    setState(() => ageGroup = 'below 12');
+                  }),
                   _buildSelectionButton('12 - 17', ageGroup == '12 - 17', () {
                     setState(() => ageGroup = '12 - 17');
                   }),
