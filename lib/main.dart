@@ -12,6 +12,7 @@ import 'package:fyp_wyc/view/home_user/about_activity.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
 import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:fyp_wyc/view/home_user/recipe_details.dart';
+import 'package:fyp_wyc/view/home_user/recipe_edit.dart';
 import 'package:fyp_wyc/view/home_user/scan_result.dart';
 import 'package:fyp_wyc/view/home_user/scanning.dart';
 import 'package:go_router/go_router.dart';
@@ -154,6 +155,14 @@ List<RouteBase> routes() {
         final Recipe recipe = extras['recipe'] as Recipe;
         final User? user = extras['user'] as User?;
         return RecipeDetailsPage(recipe: recipe, user: user);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.recipeEdit.path}',
+      builder: (context, state) {
+        final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+        final Recipe recipe = extras['recipe'] as Recipe;
+        return RecipeEditPage(recipe: recipe);
       },
     ),
     GoRoute(

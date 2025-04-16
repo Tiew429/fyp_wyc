@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_wyc/data/viewdata.dart';
 import 'package:fyp_wyc/event/local_user_event.dart';
 import 'package:fyp_wyc/event/online_user_event.dart';
 import 'package:fyp_wyc/event/recipe_event.dart';
@@ -10,6 +11,7 @@ import 'package:fyp_wyc/model/user.dart';
 import 'package:fyp_wyc/utils/my_avatar.dart';
 import 'package:fyp_wyc/utils/my_button.dart';
 import 'package:fyp_wyc/utils/my_description.dart';
+import 'package:go_router/go_router.dart';
 
 class RecipeDetailsPage extends StatefulWidget {
   final Recipe recipe;
@@ -33,6 +35,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   late DraggableScrollableController _scrollController;
   bool isIngredientsSelected = true;
   User? creator;
+  bool isCreator = false;
   double averageRating = 0.0;
 
   @override
@@ -50,6 +53,9 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
         });
       }
     });
+
+    // check if user is creator
+    isCreator = user?.email == recipe.authorEmail;
 
     // calculate average rating
     double totalRating = 0.0;
@@ -80,6 +86,15 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
     }
   }
 
+  Future<void> _onEditTap() async {
+    navigatorKey.currentContext!.push(
+      '/${ViewData.recipeEdit.path}',
+      extra: {
+        'recipe': recipe,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -91,6 +106,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
           _buildRecipeBottomSheet(screenSize),
           _buildExitButton(),
           _buildSaveButton(),
+          if (isCreator) _buildEditButton(),
         ],
       ),
     );
@@ -122,6 +138,20 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
             Icons.favorite,
             color: Colors.red,
           ) : Icon(Icons.favorite_border),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditButton() {
+    return Positioned(
+      top: 80,
+      right: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _buildButton(
+          () => _onEditTap(),
+          Icon(Icons.edit),
         ),
       ),
     );
@@ -674,30 +704,4 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
       ],
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: RecipeDetailsPage(
-      recipe: Recipe(
-        recipeID: "1", 
-        recipeName: "Recipe 1", 
-        description: "Description", 
-        imageUrl: "https://via.placeholder.com/150", 
-        authorEmail: "author@example.com", 
-        timeToCookInMinute: 10, 
-        steps: ["Step 1", "Step 2", "Step 3"], 
-        ingredients: [Ingredient(ingredientName: "Ingredient 1", amount: 1, unit: Unit.cup)], 
-        tags: [Tag.chinese, Tag.western, Tag.healthy, Tag.dessert, Tag.soup, Tag.salad, Tag.pasta, Tag.rice, Tag.meat, Tag.fish, Tag.seafood, Tag.vegetable, Tag.fruit, Tag.dairy, Tag.bread, Tag.cake, Tag.pastry, Tag.iceCream, Tag.candy, Tag.chocolate, Tag.other],
-        rating: {"user@example.com": 4.5},
-      ),
-      user: User(
-        email: "user@example.com",
-        username: "User 1",
-        savedRecipes: ["1"],
-        phone: '',
-        createdAt: '',
-      ),
-    ),
-  ));
 }

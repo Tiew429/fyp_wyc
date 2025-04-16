@@ -4,6 +4,7 @@ enum ViewData {
   profileEdit,
   dashboard,
   recipeDetails,
+  recipeEdit,
   scanning,
   scanResult,
   aboutActivity;

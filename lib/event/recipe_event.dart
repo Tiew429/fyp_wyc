@@ -155,4 +155,32 @@ class RecipeStore {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> updateRecipe(Recipe recipe, bool isImageChanged) async {
+    try {
+      FirebaseServices firebaseServices = FirebaseServices();
+      final result = await firebaseServices.updateRecipe(recipe, isImageChanged);
+      
+      if (result['success']) {
+        // Update the recipe in the local list
+        final index = _recipeList.indexWhere((r) => r.recipeID == recipe.recipeID);
+        if (index != -1) {
+          _recipeList[index] = result['updatedRecipe'];
+
+          // update local recipe
+          _recipe = result['updatedRecipe'];
+
+          // Fire event when recipe data changes
+          AppEventBus.instance.fire(RecipeEvent(recipeList: _recipeList));
+        }
+      }
+      
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Failed to update recipe: $e',
+      };
+    }
+  }
 }

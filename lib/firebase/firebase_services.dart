@@ -360,12 +360,12 @@ class FirebaseServices {
 
       return {
         'success': true,
-        'message': 'Recipe added to history successfully',
+        'message': 'Recipe is added to your history.',
       };
     } catch (e) {
       return {
         'success': false,
-        'message': 'Error occured when adding recipe to history: $e',
+        'message': 'Failed to add recipe to your history.',
       };
     }
   }
@@ -403,6 +403,48 @@ class FirebaseServices {
       return {
         'success': false,
         'message': 'Error occured when updating user rating: $e',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> updateRecipe(Recipe recipe, bool isImageChanged) async {
+    try {
+      // Handle image upload first if needed
+      String updatedImageUrl = recipe.imageUrl;
+      if (isImageChanged) {
+        updatedImageUrl = await uploadRecipeImage(recipe.recipeID, recipe.imageUrl);
+      }
+      
+      // Create a copy of the recipe with the updated image URL
+      Recipe updatedRecipe = Recipe(
+        recipeID: recipe.recipeID,
+        recipeName: recipe.recipeName,
+        description: recipe.description,
+        imageUrl: updatedImageUrl,
+        authorEmail: recipe.authorEmail,
+        timeToCookInMinute: recipe.timeToCookInMinute,
+        difficulty: recipe.difficulty,
+        steps: recipe.steps,
+        ingredients: recipe.ingredients,
+        tags: recipe.tags,
+        rating: recipe.rating,
+        commentIDs: recipe.commentIDs,
+        viewCount: recipe.viewCount,
+        savedCount: recipe.savedCount,
+      );
+      
+      // Update the recipe in Firestore using toJson() to properly convert enums
+      await _recipeCollection.doc(recipe.recipeID).update(updatedRecipe.toJson());
+
+      return {
+        'success': true,
+        'message': 'Recipe updated successfully.',
+        'updatedRecipe': updatedRecipe,
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Failed to update recipe: $e',
       };
     }
   }
