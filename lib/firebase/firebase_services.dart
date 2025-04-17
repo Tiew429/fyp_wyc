@@ -434,7 +434,7 @@ class FirebaseServices {
     }
   }
 
-  Future<Map<String, dynamic>> submitRecipeRating(String recipeID, double rating) async {
+  Future<Map<String, dynamic>> submitRecipeRating(String recipeID, Map<String, double> recipeRating, double rating) async {
     try {
       // get current user
       final currentUser = _firebaseAuth.currentUser;
@@ -447,14 +447,13 @@ class FirebaseServices {
 
       // update user rating
       await _userCollection.doc(currentUser.email).update({
-        'recipeRating': {
-          recipeID: rating,
-        },
+        'recipeRating.$recipeID': rating,
       });
 
       // update recipe rating
       await _recipeCollection.doc(recipeID).update({
         'rating': {
+          ...recipeRating,
           currentUser.email: rating,
         },
       });

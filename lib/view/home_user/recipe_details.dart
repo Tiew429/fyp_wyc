@@ -31,11 +31,13 @@ class RecipeDetailsPage extends StatefulWidget {
 
 class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTickerProviderStateMixin {
   late Recipe recipe;
+  late Recipe recipeCopy;
   Image? image;
   User? user;
   bool isSaved = false;
   late DraggableScrollableController _scrollController;
   bool isIngredientsSelected = true;
+  double ratingNow = 0.0;
   User? creator;
   bool isCreator = false;
   double averageRating = 0.0;
@@ -47,6 +49,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
     isAdmin = widget.isAdmin ?? false;
 
     recipe = widget.recipe;
+    recipeCopy = widget.recipe;
     user = widget.user;
     isSaved = user?.savedRecipes.contains(recipe.recipeID) ?? false;
     image = _buildRecipeImage();
@@ -495,8 +498,13 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   }
 
   Widget _buildIngredientItem(Ingredient ingredient) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5),
+    String unitDisplay = ingredient.unit.name;
+    if (ingredient.unit == Unit.tsp || ingredient.unit == Unit.tbsp) {
+      unitDisplay = "${ingredient.unit.name} (${ingredient.unit.description})";
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         children: [
           Text(ingredient.ingredientName,
@@ -506,7 +514,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
             ),
           ),
           Spacer(),
-          Text('${ingredient.amount} ${ingredient.unit.name}',
+          Text('${ingredient.amount} $unitDisplay',
             style: TextStyle(
               fontSize: 20,
               color: Colors.grey.shade700,
@@ -625,17 +633,16 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
   }
 
   Widget _buildRatingSection(Map<String, double> rating) {
-    double? originalUserRating = user != null ? rating[user!.email] : 0.0;
-    double userRating = originalUserRating ?? 0.0;
-    bool isRated = user != null || (originalUserRating != 0.0);
-    bool isRating = (userRating != 0.0);
+    double? userRating = recipeCopy.rating[user?.email];
+    bool isRated = (user != null) && (userRating != 0.0) && (userRating != null);
+    bool isRating = (ratingNow != 0.0);
     bool isLoading = false;
 
     Future<void> onRatingSubmit() async {
       setState(() {
         isLoading = true;
       });
-      await LocalUserStore.submitRecipeRating(recipe.recipeID, userRating);
+      await LocalUserStore.submitRecipeRating(recipe.recipeID, recipe.rating, ratingNow);
       // show success message
       MySnackBar.showSnackBar("Rating submitted!");
       setState(() {
@@ -656,7 +663,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStarRating(userRating.toInt(), isRated),
+            _buildStarRating(userRating != null ? userRating.toInt() : ratingNow.toInt(), isRated),
           ],
         ),
         SizedBox(height: 10),
@@ -681,11 +688,14 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> with SingleTicker
     return Row(
       children: List.generate(5, (index) => IconButton(
         onPressed: () {
+          print("isRated: $isRated");
+          print("rating of recipe: ${recipe.rating}");
+          print("rating of recipeCopy: ${recipeCopy.rating}");
           if (!isRated) {
             setState(() {
               final newRating = (index + 1).toDouble();
               if (user != null) {
-                recipe.rating[user!.email] = newRating;
+                ratingNow = newRating;
               } else {
                 MySnackBar.showSnackBar("Please login to rate this recipe");
               }

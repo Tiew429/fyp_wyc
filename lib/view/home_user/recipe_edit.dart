@@ -557,9 +557,14 @@ class _RecipeEditPageState extends State<RecipeEditPage> {
                   itemCount: _ingredients.length,
                   separatorBuilder: (context, index) => Divider(height: 1),
                   itemBuilder: (context, index) {
+                    String unitDisplay = _ingredients[index].unit.name;
+                    if (_ingredients[index].unit == Unit.tsp || _ingredients[index].unit == Unit.tbsp) {
+                      unitDisplay = "${_ingredients[index].unit.name} (${_ingredients[index].unit.description})";
+                    }
+                    
                     return ListTile(
                       title: Text(_ingredients[index].ingredientName),
-                      subtitle: Text('${_ingredients[index].amount} ${_ingredients[index].unit.name}'),
+                      subtitle: Text('${_ingredients[index].amount} $unitDisplay'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -665,9 +670,13 @@ class _RecipeEditPageState extends State<RecipeEditPage> {
                     border: OutlineInputBorder(),
                   ),
                   items: Unit.values.map((Unit unitValue) {
+                    String unitText = unitValue.name;
+                    if (unitValue == Unit.tsp || unitValue == Unit.tbsp) {
+                      unitText = "${unitValue.name} (${unitValue.description})";
+                    }
                     return DropdownMenuItem<Unit>(
                       value: unitValue,
-                      child: Text(unitValue.name),
+                      child: Text(unitText),
                     );
                   }).toList(),
                   onChanged: (Unit? newValue) {
@@ -792,9 +801,13 @@ class _RecipeEditPageState extends State<RecipeEditPage> {
                     border: OutlineInputBorder(),
                   ),
                   items: Unit.values.map((Unit unitValue) {
+                    String unitText = unitValue.name;
+                    if (unitValue == Unit.tsp || unitValue == Unit.tbsp) {
+                      unitText = "${unitValue.name} (${unitValue.description})";
+                    }
                     return DropdownMenuItem<Unit>(
                       value: unitValue,
-                      child: Text(unitValue.name),
+                      child: Text(unitText),
                     );
                   }).toList(),
                   onChanged: (Unit? newValue) {

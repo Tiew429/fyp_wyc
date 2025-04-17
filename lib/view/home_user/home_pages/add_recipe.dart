@@ -473,7 +473,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
         children: [
           Expanded(
             child: Text(
-              '${ingredient.ingredientName} (${ingredient.amount} ${ingredient.unit.name})',
+              '${ingredient.ingredientName} (${ingredient.amount} ${ingredient.unit == Unit.tsp || ingredient.unit == Unit.tbsp ? "${ingredient.unit.name} (${ingredient.unit.description})" : ingredient.unit.name})',
               style: TextStyle(fontSize: 16),
             ),
           ),
@@ -919,9 +919,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     border: OutlineInputBorder(),
                   ),
                   items: Unit.values.map((Unit unitValue) {
+                    String unitText = unitValue.name;
+                    if (unitValue == Unit.tsp || unitValue == Unit.tbsp) {
+                      unitText = "${unitValue.name} (${unitValue.description})";
+                    }
                     return DropdownMenuItem<Unit>(
                       value: unitValue,
-                      child: Text(unitValue.name),
+                      child: Text(unitText),
                     );
                   }).toList(),
                   onChanged: (Unit? newValue) {

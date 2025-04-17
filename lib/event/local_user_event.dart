@@ -107,17 +107,30 @@ class LocalUserStore {
       }
 
       // update user
-      final updatedUser = _currentUser?.copyWith(
-        username: newName,
-        phone: newPhone,
-        aboutMe: newAboutMe,
-        gender: newGender,
-        avatarUrl: imageUrl != '' ? imageUrl : _currentUser?.avatarUrl,
-      );
+      User? updatedUser;
 
-      // update current user avatar
-      if (imageUrl != '') {
-        _currentUserAvatar = Image.network(imageUrl);
+      if (_currentUser != null) {
+        updatedUser = _currentUser?.copyWith(
+          username: newName,
+          phone: newPhone,
+          aboutMe: newAboutMe,
+          gender: newGender,
+          avatarUrl: imageUrl != '' ? imageUrl : _currentUser?.avatarUrl,
+        );
+
+        // update current user avatar
+        if (imageUrl != '') {
+          _currentUserAvatar = Image.network(imageUrl);
+        }
+      } else {
+        updatedUser = await firebaseServices.getUserByEmail(email);
+        updatedUser = updatedUser?.copyWith(
+          username: newName,
+          phone: newPhone,
+          aboutMe: newAboutMe,
+          gender: newGender,
+          avatarUrl: imageUrl != '' ? imageUrl : updatedUser.avatarUrl,
+        );
       }
 
       // update user in firebase
@@ -186,10 +199,10 @@ class LocalUserStore {
       };
     }
   }
-  static Future<Map<String, dynamic>> submitRecipeRating(String recipeID, double rating) async {
+  static Future<Map<String, dynamic>> submitRecipeRating(String recipeID, Map<String, double> recipeRating, double rating) async {
     try {
       FirebaseServices firebaseServices = FirebaseServices();
-      final response = await firebaseServices.submitRecipeRating(recipeID, rating);
+      final response = await firebaseServices.submitRecipeRating(recipeID, recipeRating, rating);
 
       // update user rating
       _currentUser = _currentUser?.copyWith(recipeRating: {

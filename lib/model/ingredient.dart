@@ -64,9 +64,30 @@ enum Unit {
   l,
   kg,
   pc,
-  tsp,
-  tbsp,
+  tsp, // teaspoon
+  tbsp, // tablespoon
   cup;
 
   String get unitName => name;
+  
+  String get description {
+    switch (this) {
+      case Unit.ml:
+        return 'Milliliter';
+      case Unit.g:
+        return 'Gram';
+      case Unit.l:
+        return 'Liter';
+      case Unit.kg:
+        return 'Kilogram';
+      case Unit.pc:
+        return 'Piece';
+      case Unit.tsp:
+        return 'Teaspoon';
+      case Unit.tbsp:
+        return 'Tablespoon';
+      case Unit.cup:
+        return 'Cup';
+    }
+  }
 }
