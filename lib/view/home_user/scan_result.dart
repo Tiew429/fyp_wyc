@@ -26,6 +26,7 @@ class ScanResultPage extends StatefulWidget {
 class _ScanResultPageState extends State<ScanResultPage> {
   User? user;
   List<String> selectedIngredients = [];
+  List<String> allDetectedIngredients = []; // Store all detected ingredients
   List<Recipe> recipes = [];
   List<Recipe> filteredRecipes = [];
 
@@ -33,39 +34,85 @@ class _ScanResultPageState extends State<ScanResultPage> {
   void initState() {
     super.initState();
     user = widget.user;
-    selectedIngredients = widget.selectedIngredients;
+    // Save all detected ingredients from the scan
+    allDetectedIngredients = List.from(widget.selectedIngredients);
+    // Initially all ingredients are selected
+    selectedIngredients = List.from(widget.selectedIngredients);
     recipes = widget.recipes;
     
+    _filterRecipes();
+  }
+  
+  // Method to filter recipes based on selected ingredients
+  void _filterRecipes() {
     // Clear the filtered recipes list first
     filteredRecipes = [];
+    
+    // If no ingredients are selected, no recipes to show
+    if (selectedIngredients.isEmpty) {
+      return;
+    }
     
     // Create a Set to track which recipes we've already added
     Set<String> addedRecipeIds = {};
     
     for (var recipe in recipes) {
-      bool hasMatch = false;
+      // For each recipe, check if it contains ALL of the selected ingredients
+      bool containsAllIngredients = true;
       
-      // Check if this recipe has any of the selected ingredients
-      for (var ingredient in recipe.ingredients) {
-        for (var selectedIngredient in selectedIngredients) {
-            print("${addedRecipeIds}2");
-          if (ingredient.ingredientName.toLowerCase().trim() == selectedIngredient.toLowerCase().trim()) {
-            print("111${addedRecipeIds}");
-            hasMatch = true;
+      // Check each selected ingredient
+      for (var selectedIngredient in selectedIngredients) {
+        bool foundIngredient = false;
+        
+        // Look for this ingredient in the recipe
+        for (var recipeIngredient in recipe.ingredients) {
+          if (recipeIngredient.ingredientName.toLowerCase().trim() == selectedIngredient.toLowerCase().trim()) {
+            foundIngredient = true;
             break;
           }
         }
-        if (hasMatch) break;
+        
+        // If any selected ingredient is not found in the recipe, recipe doesn't match
+        if (!foundIngredient) {
+          containsAllIngredients = false;
+          break;
+        }
       }
       
-      // If we found a match and haven't added this recipe yet, add it
-      if (hasMatch && !addedRecipeIds.contains(recipe.recipeID)) {
+      // If recipe contains all selected ingredients and hasn't been added yet, add it
+      if (containsAllIngredients && !addedRecipeIds.contains(recipe.recipeID)) {
         filteredRecipes.add(recipe);
         addedRecipeIds.add(recipe.recipeID);
       }
     }
-    
-    print("Found ${filteredRecipes.length} filtered recipes");
+  }
+
+  // Toggle ingredient selection
+  void _toggleIngredient(String ingredient) {
+    setState(() {
+      if (selectedIngredients.contains(ingredient)) {
+        selectedIngredients.remove(ingredient);
+      } else {
+        selectedIngredients.add(ingredient);
+      }
+      _filterRecipes();
+    });
+  }
+  
+  // Select all ingredients
+  void _selectAllIngredients() {
+    setState(() {
+      selectedIngredients = List.from(allDetectedIngredients);
+      _filterRecipes();
+    });
+  }
+  
+  // Clear all ingredient selections
+  void _clearAllIngredients() {
+    setState(() {
+      selectedIngredients.clear();
+      _filterRecipes();
+    });
   }
 
   @override
@@ -115,33 +162,84 @@ class _ScanResultPageState extends State<ScanResultPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Selected Ingredients:',
+            'Detected Ingredients:',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 26, 218, 128),
             ),
           ),
+          Text(
+            'Tap to select/unselect ingredients. Recipes must contain ALL selected ingredients.',
+            style: TextStyle(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: Colors.grey[700],
+            ),
+          ),
           SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: selectedIngredients.map((ingredient) {
-              return Chip(
-                label: Text(ingredient),
-                backgroundColor: Color.fromARGB(255, 173, 216, 230),
-                labelStyle: TextStyle(color: Colors.black87),
+            children: allDetectedIngredients.map((ingredient) {
+              final isSelected = selectedIngredients.contains(ingredient);
+              return GestureDetector(
+                onTap: () => _toggleIngredient(ingredient),
+                child: Chip(
+                  label: Text(ingredient),
+                  backgroundColor: isSelected 
+                    ? Color.fromARGB(255, 173, 216, 230) 
+                    : Colors.grey[300],
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.black87 : Colors.black54,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                  avatar: isSelected 
+                    ? Icon(Icons.check_circle, size: 18, color: Colors.green) 
+                    : null,
+                ),
               );
             }).toList(),
           ),
-          SizedBox(height: 4),
-          Text(
-            'Found ${filteredRecipes.length} matching recipes',
-            style: TextStyle(
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
-              color: Colors.grey[700],
-            ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'Found ${filteredRecipes.length} recipes with ALL selected ingredients',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ),
+              if (allDetectedIngredients.length > 1) // Only show if there are multiple ingredients
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: _selectAllIngredients,
+                      icon: Icon(Icons.select_all, size: 18),
+                      label: Text('Select All'),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        minimumSize: Size(0, 0),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    TextButton.icon(
+                      onPressed: _clearAllIngredients,
+                      icon: Icon(Icons.clear_all, size: 18),
+                      label: Text('Clear All'),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        minimumSize: Size(0, 0),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
         ],
       ),

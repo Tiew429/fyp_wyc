@@ -296,6 +296,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
             _buildTags(screenSize),
             // submit button
             _buildSubmitButton(screenSize),
+            SizedBox(height: 100),
           ],
         ),
       ),

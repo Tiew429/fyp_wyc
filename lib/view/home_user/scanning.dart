@@ -197,24 +197,40 @@ class _ScanningPageState extends State<ScanningPage> {
         ),
       ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text('Ingredient Recognition',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Text('Ingredient Recognition',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Image.file(File(_image.path)),
-            const SizedBox(height: 20),
-            isScanning ? _buildScanningProgress() : _buildScanningResult(),
-          ],
+              const SizedBox(height: 10),
+              // Constrain image size to prevent overflow
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.4, // Limit height to 40% of screen
+                  ),
+                  child: Image.file(
+                    File(_image.path),
+                    fit: BoxFit.contain, // Maintain aspect ratio
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              isScanning ? _buildScanningProgress() : _buildScanningResult(),
+              const SizedBox(height: 20), // Add bottom padding
+            ],
+          ),
         ),
       ),
     );
@@ -236,43 +252,54 @@ class _ScanningPageState extends State<ScanningPage> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch, // Fill available width
         children: [
           const Text('Scanning Result',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           Text('Please select the ingredients you see in the image',
             style: TextStyle(
               fontSize: 16,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: SingleChildScrollView(
-              child: Column(
-                children: predictions.map((prediction) {
-                  final label = prediction['label'] as String;
-                  return CheckboxListTile(
-                    title: Text(label),
-                    value: selectedIngredients.contains(label),
-                    activeColor: Color.fromARGB(255, 26, 218, 128),
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (value == true) {
-                          selectedIngredients.add(label);
-                        } else {
-                          selectedIngredients.remove(label);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(12),
             ),
+            height: 200, // Fixed height with scrolling
+            child: predictions.isEmpty 
+              ? Center(child: Text('No ingredients detected'))
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: predictions.length,
+                  itemBuilder: (context, index) {
+                    final prediction = predictions[index];
+                    final label = prediction['label'] as String;
+                    return CheckboxListTile(
+                      dense: true, // Make the list tiles more compact
+                      title: Text(label),
+                      value: selectedIngredients.contains(label),
+                      activeColor: Color.fromARGB(255, 26, 218, 128),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            selectedIngredients.add(label);
+                          } else {
+                            selectedIngredients.remove(label);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
           ),
           const SizedBox(height: 20),
           Row(
@@ -285,7 +312,7 @@ class _ScanningPageState extends State<ScanningPage> {
                 width: MediaQuery.of(context).size.width * 0.4,
               ),
               MyButton(
-                onPressed: _onContinue,
+                onPressed: selectedIngredients.isEmpty ? () {} : _onContinue, // Disable if no selections
                 text: 'Continue',
                 width: MediaQuery.of(context).size.width * 0.4,
               ),

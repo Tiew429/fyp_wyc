@@ -138,6 +138,7 @@ class _HomePageState extends State<HomePage> {
     await RecipeStore.getRecipeList();
     setState(() {
       recipeList = RecipeStore.recipeList;
+      filteredRecipeList = recipeList;
       isLoading = false;
     });
   }
@@ -210,6 +211,7 @@ class _HomePageState extends State<HomePage> {
         SizedBox(height: 10),
         // body widgets - Recipe Grid
         _buildRecipeGrid(),
+        SizedBox(height: 150),
       ],
     );
   }

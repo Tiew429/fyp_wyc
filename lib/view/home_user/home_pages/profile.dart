@@ -59,6 +59,11 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     await RecipeStore.getRecipeList();
     setState(() {
+      recipes = RecipeStore.recipeList;
+      userAddedRecipes = user?.addedRecipes
+        .map((e) => recipes?.firstWhere((recipe) => recipe.recipeID == e))
+        .whereType<Recipe>()
+        .toList();
       isRefreshing = false;
     });
   }
@@ -178,10 +183,13 @@ class _ProfilePageState extends State<ProfilePage> {
     return RefreshIndicator(
       onRefresh: () async => await _refreshRecipeIdeas(),
       color: Color(0xFF00BFA6),
-      child: SizedBox(
-        height: 300,
+      child: Container(
+        constraints: BoxConstraints(
+          minHeight: 300,
+          maxHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
         child: GridView.builder(
-          physics: NeverScrollableScrollPhysics(),
+          physics: AlwaysScrollableScrollPhysics(),
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -189,7 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
-          itemCount: userAddedRecipes!.length > 4 ? 4 : userAddedRecipes!.length, // Limit to 4 items
+          itemCount: userAddedRecipes!.length,
           itemBuilder: (context, index) {
             return MyRecipeBox(
               imageUrl: userAddedRecipes![index].imageUrl,

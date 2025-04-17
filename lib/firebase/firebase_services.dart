@@ -231,6 +231,7 @@ class FirebaseServices {
         'howOftenToStruggleToDecideWhatToCook': howOftenToStruggleToDecideWhatToCook,
         'haveYouThrownAwayFoodBeforeExpired': haveYouThrownAwayFoodBeforeExpired,
         'howLikelyToUseAppToFindRecipes': howLikelyToUseAppToFindRecipes,
+        'firstTimeLogin': false,
       });
 
       return {

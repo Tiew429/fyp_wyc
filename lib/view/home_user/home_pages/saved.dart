@@ -4,7 +4,6 @@ import 'package:fyp_wyc/event/recipe_event.dart';
 import 'package:fyp_wyc/main.dart';
 import 'package:fyp_wyc/model/recipe.dart';
 import 'package:fyp_wyc/model/user.dart';
-import 'package:fyp_wyc/utils/my_empty_widgets.dart';
 import 'package:fyp_wyc/utils/my_recipe_box.dart';
 import 'package:fyp_wyc/view/no_log_in/no_log_in.dart';
 import 'package:go_router/go_router.dart';
@@ -109,6 +108,7 @@ class _SavedPageState extends State<SavedPage> with SingleTickerProviderStateMix
         _buildTitleSelection(),
         // recipes grid with fade transition
         _buildRecipesGrid(),
+        SizedBox(height: 150),
       ],
     );
   }
@@ -204,11 +204,8 @@ class _SavedPageState extends State<SavedPage> with SingleTickerProviderStateMix
               );
             },
           ) :
-          MyEmptyWidgets(
-            key: ValueKey<bool>(isSavedTab),
-            text: isSavedTab ? 'No saved recipes' : 'No added recipes',
-            onPressed: widget.onEmptyButtonClick,
-            isLoading: false,
+          Text(
+            isSavedTab ? 'No saved recipes' : 'No added recipes',
           ),
       ),
     );

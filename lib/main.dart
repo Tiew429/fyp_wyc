@@ -176,7 +176,16 @@ List<RouteBase> routes() {
         final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
         final Recipe recipe = extras['recipe'] as Recipe;
         final User? user = extras['user'] as User?;
-        return RecipeDetailsPage(recipe: recipe, user: user);
+        final bool? isAdmin = extras['isAdmin'] as bool?;
+        return RecipeDetailsPage(recipe: recipe, user: user, isAdmin: isAdmin);
+      },
+    ),
+    GoRoute(
+      path: '/${ViewData.recipeEdit.path}',
+      builder: (context, state) {
+        final Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+        final Recipe recipe = extras['recipe'] as Recipe;
+        return RecipeEditPage(recipe: recipe);
       },
     ),
     GoRoute(

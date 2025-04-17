@@ -56,6 +56,9 @@ class RecipeStore {
       // update local recipe list
       _recipeList.add(recipe);
 
+      // also update the recipe into the local user's recipe list
+      LocalUserStore.currentUser?.addedRecipes.add(recipe.recipeID);
+
       // fire event when recipe data is changed
       AppEventBus.instance.fire(RecipeEvent(recipeList: _recipeList));
 

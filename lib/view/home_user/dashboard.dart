@@ -101,11 +101,9 @@ class _DashboardState extends State<Dashboard> {
   Widget _buildBody() {
     final screenSize = MediaQuery.of(context).size;
 
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(left: screenSize.width * 0.05, right: screenSize.width * 0.05, top: 16.0),
-        child: _pages[_selectedIndex],
-      ),
+    return Padding(
+      padding: EdgeInsets.only(left: screenSize.width * 0.05, right: screenSize.width * 0.05, top: 16.0),
+      child: _pages[_selectedIndex],
     );
   }
 
