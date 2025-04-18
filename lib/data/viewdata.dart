@@ -9,6 +9,9 @@ enum ViewData {
   scanning,
   scanResult,
   aboutActivity,
+  aboutUs,
+  privacyPolicy,
+  termsOfService,
   history,
   author,
   admin;

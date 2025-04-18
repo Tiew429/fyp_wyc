@@ -88,10 +88,16 @@ class _AboutActivityPageState extends State<AboutActivityPage> {
         padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 16.0, right: 16.0),
         child: Column(
           children: [
-            _buildActivityItem('About Us', () {}, null),
-            _buildActivityItem('Contact Us', () {}, null),
-            _buildActivityItem('Terms of Service', () {}, null),
-            _buildActivityItem('Privacy Policy', () {}, null),
+            _buildActivityItem('About Us', 
+              () => navigatorKey.currentContext!.push('/${ViewData.aboutUs.path}'),
+              null,
+            ),
+            _buildActivityItem('Terms of Service', () {
+              navigatorKey.currentContext!.push('/${ViewData.termsOfService.path}');
+            }, null),
+            _buildActivityItem('Privacy Policy', () {
+              navigatorKey.currentContext!.push('/${ViewData.privacyPolicy.path}');
+            }, null),
           ],
         ),
       ),

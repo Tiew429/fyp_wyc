@@ -11,15 +11,18 @@ import 'package:fyp_wyc/view/auth/auth.dart';
 import 'package:fyp_wyc/view/auth/forgot.dart';
 import 'package:fyp_wyc/view/home_admin/admin.dart';
 import 'package:fyp_wyc/view/home_user/about_activity.dart';
+import 'package:fyp_wyc/view/home_user/about_us.dart';
 import 'package:fyp_wyc/view/home_user/author_page.dart';
 import 'package:fyp_wyc/view/home_user/dashboard.dart';
 import 'package:fyp_wyc/view/home_user/demographic.dart';
 import 'package:fyp_wyc/view/home_user/history.dart';
+import 'package:fyp_wyc/view/home_user/privacy_policy.dart';
 import 'package:fyp_wyc/view/home_user/profile_edit.dart';
 import 'package:fyp_wyc/view/home_user/recipe_details.dart';
 import 'package:fyp_wyc/view/home_user/recipe_edit.dart';
 import 'package:fyp_wyc/view/home_user/scan_result.dart';
 import 'package:fyp_wyc/view/home_user/scanning.dart';
+import 'package:fyp_wyc/view/home_user/terms_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -221,6 +224,24 @@ List<RouteBase> routes() {
         final User user = state.extra as User;
         return AboutActivityPage(user: user);
       },
+    ),
+    GoRoute(
+      path: '/${ViewData.aboutUs.path}',
+      builder: (context, state) {
+        return const AboutUsPage();
+      }
+    ),
+    GoRoute(
+      path: '/${ViewData.privacyPolicy.path}',
+      builder: (context, state) {
+        return const PrivacyPolicyPage();
+      }
+    ),
+    GoRoute(
+      path: '/${ViewData.termsOfService.path}',
+      builder: (context, state) {
+        return const TermsServicesPage();
+      }
     ),
     GoRoute(
       path: '/${ViewData.history.path}',
